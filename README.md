@@ -1,10 +1,10 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/images/fireman_sam.png">
-  <source media="(prefers-color-scheme: light)" srcset=".github/images/fireman_sam.png">
-  <img alt="logo" src=".github/images/fireman_sam.png">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/images/roger_roger.png">
+  <source media="(prefers-color-scheme: light)" srcset=".github/images/roger_roger.png">
+  <img alt="logo" src=".github/images/roger_roger.png">
 </picture>
-<h1>Fireman Sam</h1>
-<h3>The Dumpster Fire</h3>
+<h1>RogerRoger</h1>
+<h3>The Old Republic</h3>
 
 ***  
 ![License](https://img.shields.io/github/license/moldypenguins/FiremanSam?logo=GNU&style=for-the-badge&color=BD0000)
