@@ -118,7 +118,7 @@ DB.connection.once("open", async () => {
           //send new message
           client.channels.cache.get(_guild.guild_stockpiles).send({ 
             embeds: [{
-              color: 0xAEC6CF,
+              color: 0x2B2D31,
               author: {
                 name: `${_stockpiles[_s].stockpile_hex} - ${_stockpiles[_s].stockpile_town}`,
                 icon_url: _stockpiles[_s].stockpile_building == "Seaport" ? 'https://i.imgur.com/riii9l5.png' : 'https://i.imgur.com/9Tvrj9W.png'
