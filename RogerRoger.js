@@ -198,8 +198,8 @@ DB.connection.once("open", async () => {
     //check for bot
     if (oldState.member.user.bot) { return; }
 
-    let message;
-    let color; 
+    let message = null;
+    let color = null; 
     //#fdfd96 - yellow
     //#aec6cf - blue
     if (newState.channelId === null) {
@@ -208,20 +208,22 @@ DB.connection.once("open", async () => {
     } else if (oldState.channelId === null) {
       message = `${userMention(oldState.member.user.id)} joined ${channelMention(newState.channelId)}`;
       color = 0x77dd77;
-    } else {
+    } else if(newState.channelId !== oldState.channelId) {
       message = `${userMention(oldState.member.user.id)} moved from ${channelMention(oldState.channelId)} to ${channelMention(newState.channelId)}`;
       color = 0xffb347;
     }
-    client.channels.cache.get(Config.discord.channel_id).send({embeds: [
-      {
-        color: color,
-        description: message,
-        author: {
-          name: 'Voice State Update',
-          icon_url: 'https://i.imgur.com/aH8d7IZ.png'
-        },
-      }
-    ]});
+    if(message && color) {
+      client.channels.cache.get(Config.discord.channel_id).send({embeds: [
+        {
+          color: color,
+          description: message,
+          author: {
+            name: 'Voice State Update',
+            icon_url: 'https://i.imgur.com/aH8d7IZ.png'
+          },
+        }
+      ]});
+    }
   });
 
 
