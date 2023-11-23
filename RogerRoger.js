@@ -28,7 +28,7 @@ import util from "util";
 import Config from "./config.js";
 import { DB, Guild, Stockpile } from "./db.js";
 
-import { ActivityType, Client, Collection, Events, GatewayIntentBits, Routes, REST, ActionRowBuilder, ButtonStyle, ButtonBuilder, time } from "discord.js";
+import { ActivityType, Client, Collection, Events, GatewayIntentBits, Routes, REST, ActionRowBuilder, ButtonStyle, ButtonBuilder, time, userMention, channelMention } from "discord.js";
 import BotCommands from "./BotCommands/BotCommands.js";
 import BotEvents from "./BotEvents/BotEvents.js";
 
@@ -192,19 +192,22 @@ DB.connection.once("open", async () => {
     }
   });
 
-  client.on('voiceStateUpdate', (oldState, newState) => {
-    // check for bot
-    if (oldState.member.user.bot) { return };
 
-    // the rest of your code
-    if (newState.channelID === null) {
-      console.log('user left channel', oldState.channelID);
-    } else if (oldState.channelID === null) {
-      console.log('user joined channel', newState.channelID);
+  client.on('voiceStateUpdate', (oldState, newState) => {
+    //check for bot
+    if (oldState.member.user.bot) { return; }
+
+    let message = ""
+    if (newState.channelId === null) {
+      console.log(`${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`);
+    } else if (oldState.channelId === null) {
+      console.log(`${userMention(oldState.member.user.id)} joined ${channelMention(newState.channelId)}`);
     } else {
-      console.log('user moved channels', oldState.channelID, newState.channelID);
+      message = `${userMention(oldState.member.user.id)} moved from ${channelMention(oldState.channelId)} to ${channelMention(newState.channelId)}`;
     }
+    client.channels.cache.get(Config.discord.channel_id).send(message);
   });
+
 
   client.on(Events.InteractionCreate, async (interaction) => {
     if(
