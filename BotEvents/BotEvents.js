@@ -24,10 +24,17 @@
 
 import GuildAuditLogEntryCreate from "./GuildAuditLogEntryCreate.js";
 import GuildCreate from "./GuildCreate.js";
+import GuildMemberAdd from "./GuildMemberAdd.js";
+import GuildMemberRemove from "./GuildMemberRemove.js";
+import VoiceStateUpdate from "./VoiceStateUpdate.js";
+
 
 let BotEvents = {
   GuildAuditLogEntryCreate,
-  GuildCreate
+  GuildCreate,
+  GuildMemberAdd,
+  GuildMemberRemove,
+  VoiceStateUpdate
 };
 
 export default BotEvents;
