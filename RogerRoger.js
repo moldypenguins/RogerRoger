@@ -197,7 +197,7 @@ DB.connection.once("open", async () => {
     //check for bot
     if (oldState.member.user.bot) { return; }
 
-    let message = `${client.emojis.cache.find(emoji => emoji.name === "loud_sound")}`;
+    let message = ":loud_sound:";
     if (newState.channelId === null) {
       message += ` ${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`;
     } else if (oldState.channelId === null) {
