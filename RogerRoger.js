@@ -197,17 +197,17 @@ DB.connection.once("open", async () => {
     //check for bot
     if (oldState.member.user.bot) { return; }
 
-    let message = ":loud_sound: ";
-    let color = 0x0099ff;
+    let message;
+    let color;
     if (newState.channelId === null) {
-      message += `${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`;
-      color = 0xff9900;
+      message = `${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`;
+      color = 0xff6961;
     } else if (oldState.channelId === null) {
-      message += `${userMention(oldState.member.user.id)} joined ${channelMention(newState.channelId)}`;
-      color = 0x00ff99;
+      message = `${userMention(oldState.member.user.id)} joined ${channelMention(newState.channelId)}`;
+      color = 0x77dd77;
     } else {
-      message += `${userMention(oldState.member.user.id)} moved from ${channelMention(oldState.channelId)} to ${channelMention(newState.channelId)}`;
-      color = 0x0099ff;
+      message = `${userMention(oldState.member.user.id)} moved from ${channelMention(oldState.channelId)} to ${channelMention(newState.channelId)}`;
+      color = 0xffb347;
     }
     client.channels.cache.get(Config.discord.channel_id).send({embeds: [
       {
