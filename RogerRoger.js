@@ -133,7 +133,6 @@ DB.connection.once("open", async () => {
                   value: `*Expires ${time(_refresh, "R")}*`,
                   inline: true
                 }
-
               ]
             }],
             components: [new ActionRowBuilder().addComponents(
