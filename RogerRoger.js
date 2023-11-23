@@ -119,20 +119,12 @@ DB.connection.once("open", async () => {
           client.channels.cache.get(_guild.guild_stockpiles).send({ 
             embeds: [{
               color: 0x0099FF,
-              title: `${_stockpiles[_s].stockpile_hex} - ${_stockpiles[_s].stockpile_town}`,
-              fields: [{ 
-                name: "", 
-                value: `${client.emojis.cache.find(emoji => emoji.name === _stockpiles[_s].stockpile_building.replace(/\s/g, ""))}`, 
-                inline: true 
-              },{ 
-                name: "", 
-                value: `**${_stockpiles[_s].stockpile_code}**`, 
-                inline: true 
-              },{ 
-                name: "", 
-                value: `*${time(_refresh, "R")}*`, 
-                inline: true 
-              }]
+              author: {
+                name: `${_stockpiles[_s].stockpile_hex} - ${_stockpiles[_s].stockpile_town}`,
+                icon_url: 'https://i.imgur.com/aH8d7IZ.png'
+              },
+              title: `**${_stockpiles[_s].stockpile_code}**`, 
+              description: `*${time(_refresh, "R")}*`
             }],
             components: [new ActionRowBuilder().addComponents(
               new ButtonBuilder()
@@ -214,7 +206,6 @@ DB.connection.once("open", async () => {
     client.channels.cache.get(Config.discord.channel_id).send({embeds: [
       {
         color: color,
-        title: ":loud_sound: Voice State Update",
         description: message,
         author: {
           name: 'Voice State Update',
