@@ -198,7 +198,9 @@ DB.connection.once("open", async () => {
     if (oldState.member.user.bot) { return; }
 
     let message;
-    let color;
+    let color; 
+    //#fdfd96 - yellow
+    //#aec6cf - blue
     if (newState.channelId === null) {
       message = `${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`;
       color = 0xff6961;
@@ -212,6 +214,7 @@ DB.connection.once("open", async () => {
     client.channels.cache.get(Config.discord.channel_id).send({embeds: [
       {
         color: color,
+        title: ":loud_noise: Voice State Update",
         description: message,
         author: {
           name: 'Voice State Update',
