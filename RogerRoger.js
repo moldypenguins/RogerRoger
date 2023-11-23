@@ -197,10 +197,10 @@ DB.connection.once("open", async () => {
     if (oldState.member.user.bot) return;
 
     // the rest of your code
-    console.log("OLD: ", util.inspect(oldState, true, 2, true));
-    console.log("NEW: ", util.inspect(newState, true, 2, true));
+    console.log("OLD: ", util.inspect(oldState, true, 1, true));
+    console.log("NEW: ", util.inspect(newState, true, 1, true));
 
-    
+
   });
 
   client.on(Events.InteractionCreate, async (interaction) => {
