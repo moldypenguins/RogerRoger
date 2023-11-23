@@ -233,7 +233,8 @@ DB.connection.once("open", async () => {
     client.channels.cache.get(_guild.guild_welcome).send({ 
       embeds: [{
         color: 0x2B2D31,
-        description: "Hey @RogerRoger, welcome to The Old Republic! Thank you for picking TOR for your foxhole experience. If you're here for other games please let us know so we can give you the correct roles."
+        description: `Hey ${userMention(member.id)}, welcome to The Old Republic!\n` 
+        +"Thank you for picking TOR for your foxhole experience. If you're here for other games please let us know so we can give you the correct roles."
         +"⬇️For Foxhole players only⬇️"
         +"Just provide us the following and we'll get you sorted."
         +"DM an @Artisan or above a screenshot of your F1 in game to be verified."
