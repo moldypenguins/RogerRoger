@@ -94,7 +94,7 @@ export default {
         select.options = _options;
 
         interaction.reply({ embeds: [{
-          color: 0x0099FF,
+          color: 0xAEC6CF,
           title: "Add Stockpile",
           fields: [
             { name: "", value: "**Hex:**", inline: false },
@@ -216,7 +216,7 @@ export default {
           //send new message
           client.channels.cache.get(_guild.guild_stockpiles).send({ 
             embeds: [{
-              color: 0x0099FF,
+              color: 0xAEC6CF,
               author: {
                 name: `${_stockpile.stockpile_hex} - ${_stockpile.stockpile_town}`,
                 icon_url: _stockpile.stockpile_building == "Seaport" ? 'https://i.imgur.com/riii9l5.png' : 'https://i.imgur.com/9Tvrj9W.png'
