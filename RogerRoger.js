@@ -227,7 +227,7 @@ DB.connection.once("open", async () => {
   });
 
 
-  client.on('guildMemberAdd', (member) => {
+  client.on('guildMemberAdd', async(member) => {
     let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
     //send message to welcome chan
     client.channels.cache.get(_guild.guild_welcome).send({ 
