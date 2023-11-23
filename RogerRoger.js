@@ -123,8 +123,6 @@ DB.connection.once("open", async () => {
                 name: `${_stockpiles[_s].stockpile_hex} - ${_stockpiles[_s].stockpile_town}`,
                 icon_url: _stockpiles[_s].stockpile_building == "Seaport" ? 'https://i.imgur.com/riii9l5.png' : 'https://i.imgur.com/9Tvrj9W.png'
               },
-              title: ``,
-              description: ,
               fields: [{
                   name:"",
                   value: `**${_stockpiles[_s].stockpile_code}**`,
