@@ -217,20 +217,22 @@ export default {
           client.channels.cache.get(_guild.guild_stockpiles).send({ 
             embeds: [{
               color: 0x0099FF,
-              title: `${_stockpile.stockpile_hex} - ${_stockpile.stockpile_town}`,
-              fields: [{ 
-                name: "", 
-                value: `${client.emojis.cache.find(emoji => emoji.name === _stockpile.stockpile_building.replace(/\s/g, ""))}`, 
-                inline: true 
-              },{ 
-                name: "", 
-                value: `**${_stockpile.stockpile_code}**`, 
-                inline: true 
-              },{ 
-                name: "", 
-                value: `*${time(_refresh, "R")}*`, 
-                inline: true 
-              }]
+              author: {
+                name: `${_stockpile.stockpile_hex} - ${_stockpile.stockpile_town}`,
+                icon_url: _stockpile.stockpile_building == "Seaport" ? 'https://i.imgur.com/riii9l5.png' : 'https://i.imgur.com/9Tvrj9W.png'
+              },
+              fields: [{
+                  name:"",
+                  value: `**${_stockpile.stockpile_code}**`,
+                  inline: true
+                },
+                {
+                  name:"",
+                  value: `*Expires ${time(_refresh, "R")}*`,
+                  inline: true
+                }
+
+              ]
             }],
             components: [new ActionRowBuilder().addComponents(
               new ButtonBuilder()
@@ -262,18 +264,15 @@ export default {
           let _stockpile = await Stockpile.findOne({_id: _sid});
           //console.log(`STOCK: ${util.inspect(_stockpile, true, null, true)}`);
           let _embed = EmbedBuilder.from(interaction.message.embeds[0]);
-          _embed.fields = [{ 
-            name: "", 
-            value: `${client.emojis.cache.find(emoji => emoji.name === _stockpile.stockpile_building.replace(/\s/g, ""))}`, 
-            inline: true 
-          },{ 
-            name: "", 
-            value: `**${_stockpile.stockpile_code}**`, 
-            inline: true 
-          },{ 
-            name: "", 
-            value: `*${time(_refresh, "R")}*`, 
-            inline: true 
+          _embed.fields = [{
+            name:"",
+            value: `**${_stockpile.stockpile_code}**`,
+            inline: true
+          },
+          {
+            name:"",
+            value: `*Expires ${time(_refresh, "R")}*`,
+            inline: true
           }];
 
           interaction.message.edit({
