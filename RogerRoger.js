@@ -214,7 +214,7 @@ DB.connection.once("open", async () => {
     client.channels.cache.get(Config.discord.channel_id).send({embeds: [
       {
         color: color,
-        title: ":loud_noise: Voice State Update",
+        title: ":loud_sound: Voice State Update",
         description: message,
         author: {
           name: 'Voice State Update',
