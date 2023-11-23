@@ -235,7 +235,7 @@ DB.connection.once("open", async () => {
         color: 0x2B2D31,
         description: `Hey ${userMention(member.id)}.\nWelcome to **The Old Republic**!\n\n` 
         +"Thank you for picking **TOR** for your foxhole experience.\n"
-        +`Message an ${roleMention(1099256574855360512)} or ${roleMention(549158076897427498)}\n`
+        +`Message an ${roleMention('1099256574855360512')} or ${roleMention('549158076897427498')}\n`
         +"If you're here for other games, let us know so we can give you the correct roles.\n\n"
         +"⬇️For Foxhole players only⬇️\n"
         +"Provide us the following and we'll get you sorted.\n"
