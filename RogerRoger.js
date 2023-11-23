@@ -194,13 +194,16 @@ DB.connection.once("open", async () => {
 
   client.on('voiceStateUpdate', (oldState, newState) => {
     // check for bot
-    if (oldState.member.user.bot) return;
+    if (oldState.member.user.bot) { return };
 
     // the rest of your code
-    console.log("OLD: ", util.inspect(oldState, true, 1, true));
-    console.log("NEW: ", util.inspect(newState, true, 1, true));
-
-
+    if (newState.channelID === null) {
+      console.log('user left channel', oldState.channelID);
+    } else if (oldState.channelID === null) {
+      console.log('user joined channel', newState.channelID);
+    } else {
+      console.log('user moved channels', oldState.channelID, newState.channelID);
+    }
   });
 
   client.on(Events.InteractionCreate, async (interaction) => {
