@@ -197,11 +197,11 @@ DB.connection.once("open", async () => {
     //check for bot
     if (oldState.member.user.bot) { return; }
 
-    let message = ""
+    let message = "Unknown Voice State Update";
     if (newState.channelId === null) {
-      console.log(`${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`);
+      message = `${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`;
     } else if (oldState.channelId === null) {
-      console.log(`${userMention(oldState.member.user.id)} joined ${channelMention(newState.channelId)}`);
+      message = `${userMention(oldState.member.user.id)} joined ${channelMention(newState.channelId)}`;
     } else {
       message = `${userMention(oldState.member.user.id)} moved from ${channelMention(oldState.channelId)} to ${channelMention(newState.channelId)}`;
     }
