@@ -233,16 +233,15 @@ DB.connection.once("open", async () => {
     client.channels.cache.get(_guild.guild_welcome).send({ 
       embeds: [{
         color: 0x2B2D31,
-        description: `Hey ${userMention(member.id)}, welcome to The Old Republic!\n` 
-        +"Thank you for picking TOR for your foxhole experience. If you're here for other games please let us know so we can give you the correct roles."
-        +"⬇️For Foxhole players only⬇️"
-        +"Just provide us the following and we'll get you sorted."
-        +"DM an @Artisan or above a screenshot of your F1 in game to be verified."
-        +"If possible hop in a Voice chat with @Artisan or above for a quick briefing and introduction to the clan and game."
-        +"If you are from Another clan Please tell us which clan and what position you have in the clan so we can give the proper role for you"
-        +"Please line up your discord name with your in-game name (Nickname)"
-        +"TELL US YOUR TIMEZONE"
-        +"(Message @Artisan) or above"
+        description: `Hey ${userMention(member.id)}.\nWelcome to **The Old Republic**!\n\n` 
+        +"Thank you for picking **TOR** for your foxhole experience.\nIf you're here for other games please let us know so we can give you the correct roles.\n\n"
+        +"⬇️For Foxhole players only⬇️\n"
+        +"Provide us the following and we'll get you sorted.\n"
+        +"1. DM an @Artisan or above a screenshot of your F1 in game to be verified.\n"
+        +"2. If possible hop in a Voice chat with @Artisan or above for a quick briefing and introduction to the clan and game.\n"
+        +"3. If you are from Another clan Please tell us which clan and what position you have in the clan so we can give the proper role for you.\n"
+        +"4. Please line up your discord name with your in-game name (Nickname).\n"
+        +"5. TELL US YOUR TIMEZONE.\n"
         +"Note: BECAUSE OF OF OUR TIMEZONES WE ARE MOSTLY GREETING AND SETTING PEOPLE UP FROM 8am CST TO 10pm CST. IF YOU JOIN OUTSIDE THESE TIMES YOU WILL HAVE TO WAIT UNTIL THE PROPER  TIME UNLESS AN EU PLAYER IS UP AND ABOUT."
       }]
     });
