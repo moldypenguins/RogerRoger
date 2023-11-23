@@ -121,10 +121,9 @@ DB.connection.once("open", async () => {
               color: 0x0099FF,
               author: {
                 name: `${_stockpiles[_s].stockpile_hex} - ${_stockpiles[_s].stockpile_town}`,
-                icon_url: 'https://i.imgur.com/aH8d7IZ.png'
+                icon_url: _stockpiles[_s].stockpile_building == "Seaport" ? 'https://i.imgur.com/riii9l5.png' : 'https://i.imgur.com/9Tvrj9W.png'
               },
-              title: `**${_stockpiles[_s].stockpile_code}**`, 
-              description: `*${time(_refresh, "R")}*`
+              title: `**${_stockpiles[_s].stockpile_code}** *${time(_refresh, "R")}*`
             }],
             components: [new ActionRowBuilder().addComponents(
               new ButtonBuilder()
