@@ -125,7 +125,7 @@ DB.connection.once("open", async () => {
               },
               fields: [{
                   name:"",
-                  value: `**${_stockpiles[_s].stockpile_code}**`,
+                  value: `${_stockpiles[_s].stockpile_code}`,
                   inline: true
                 },
                 {
