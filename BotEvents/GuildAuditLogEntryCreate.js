@@ -1,13 +1,7 @@
 "use strict";
 
 import Config from "../config.js";
-import {
-  AuditLogEvent,
-  Events,
-  roleMention,
-  userMention,
-  channelMention,
-} from "discord.js";
+import { AuditLogEvent, Events, userMention, roleMention, channelMention } from "discord.js";
 import util from "util";
 
 export default {
