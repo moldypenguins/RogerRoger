@@ -200,17 +200,15 @@ DB.connection.once("open", async () => {
 
     let message = null;
     let color = null; 
-    //#fdfd96 - yellow
-    //#aec6cf - blue
     if (newState.channelId === null) {
       message = `${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`;
-      color = 0xff6961;
+      color = 0xFF6961;
     } else if (oldState.channelId === null) {
       message = `${userMention(oldState.member.user.id)} joined ${channelMention(newState.channelId)}`;
-      color = 0x77dd77;
+      color = 0x77DD77;
     } else if(newState.channelId !== oldState.channelId) {
       message = `${userMention(oldState.member.user.id)} moved from ${channelMention(oldState.channelId)} to ${channelMention(newState.channelId)}`;
-      color = 0xffb347;
+      color = 0xFFB347;
     }
     if(message && color) {
       client.channels.cache.get(Config.discord.channel_id).send({embeds: [
