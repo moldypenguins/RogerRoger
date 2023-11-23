@@ -239,8 +239,8 @@ DB.connection.once("open", async () => {
         +"If you're here for other games, let us know so we can give you the correct roles.\n\n"
         +"⬇️For Foxhole players only⬇️\n"
         +"Provide us the following and we'll get you sorted.\n"
-        +`1. DM an ${roleMention(1099256574855360512)} or ${roleMention(549158076897427498)} a screenshot of your F1 in game to be verified.\n`
-        +`2. If possible, hop in a Voice chat with an ${roleMention(1099256574855360512)} or ${roleMention(549158076897427498)} for a quick briefing and introduction to the clan and game.\n`
+        +`1. DM an ${roleMention('1099256574855360512')} or ${roleMention('549158076897427498')} a screenshot of your F1 in game to be verified.\n`
+        +`2. If possible, hop in a Voice chat with an ${roleMention('1099256574855360512')} or ${roleMention('549158076897427498')} for a quick briefing and introduction to the clan and game.\n`
         +"3. If you are from Another clan, please tell us which clan and what position you have in the clan so we can give the proper role for you.\n"
         +"4. Please change up your discord name to be the same as your in-game name (nickname).\n"
         +"5. TELL US YOUR TIMEZONE.\n\n"
