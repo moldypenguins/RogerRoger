@@ -28,7 +28,7 @@ import util from "util";
 import Config from "./config.js";
 import { DB, Guild, Stockpile } from "./db.js";
 
-import { ActivityType, Client, Collection, Events, GatewayIntentBits, Routes, REST, ActionRowBuilder, ButtonStyle, ButtonBuilder, time, userMention, channelMention } from "discord.js";
+import { ActivityType, Client, Collection, Events, GatewayIntentBits, Routes, REST, ActionRowBuilder, ButtonStyle, ButtonBuilder, time, userMention, roleMention, channelMention } from "discord.js";
 import BotCommands from "./BotCommands/BotCommands.js";
 import BotEvents from "./BotEvents/BotEvents.js";
 
