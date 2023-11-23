@@ -227,6 +227,27 @@ DB.connection.once("open", async () => {
   });
 
 
+  client.on('guildMemberAdd', (member) => {
+    let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
+    //send message to welcome chan
+    client.channels.cache.get(_guild.guild_welcome).send({ 
+      embeds: [{
+        color: 0x2B2D31,
+        description: "Hey @RogerRoger, welcome to The Old Republic! Thank you for picking TOR for your foxhole experience. If you're here for other games please let us know so we can give you the correct roles."
+        +"⬇️For Foxhole players only⬇️"
+        +"Just provide us the following and we'll get you sorted."
+        +"DM an @Artisan or above a screenshot of your F1 in game to be verified."
+        +"If possible hop in a Voice chat with @Artisan or above for a quick briefing and introduction to the clan and game."
+        +"If you are from Another clan Please tell us which clan and what position you have in the clan so we can give the proper role for you"
+        +"Please line up your discord name with your in-game name (Nickname)"
+        +"TELL US YOUR TIMEZONE"
+        +"(Message @Artisan) or above"
+        +"Note: BECAUSE OF OF OUR TIMEZONES WE ARE MOSTLY GREETING AND SETTING PEOPLE UP FROM 8am CST TO 10pm CST. IF YOU JOIN OUTSIDE THESE TIMES YOU WILL HAVE TO WAIT UNTIL THE PROPER  TIME UNLESS AN EU PLAYER IS UP AND ABOUT."
+      }]
+    });
+  });
+
+
   client.on(Events.InteractionCreate, async (interaction) => {
     if(
       !interaction.isChatInputCommand() && 

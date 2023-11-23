@@ -32,6 +32,7 @@ let GuildSchema = new mongoose.Schema({
   guild_description:     {type:String},
   guild_faction:         {type:String},
   guild_stockpiles:      {type:String},
+  guild_welcome:         {type:String},
 });
 
 export default mongoose.model("Guild", GuildSchema, "Guilds");
