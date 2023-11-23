@@ -197,13 +197,13 @@ DB.connection.once("open", async () => {
     //check for bot
     if (oldState.member.user.bot) { return; }
 
-    let message = "Unknown Voice State Update";
+    let message = `${client.emojis.cache.find(emoji => emoji.name === "loud_sound")}`;
     if (newState.channelId === null) {
-      message = `${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`;
+      message += ` ${userMention(oldState.member.user.id)} left ${channelMention(oldState.channelId)}`;
     } else if (oldState.channelId === null) {
-      message = `${userMention(oldState.member.user.id)} joined ${channelMention(newState.channelId)}`;
+      message += ` ${userMention(oldState.member.user.id)} joined ${channelMention(newState.channelId)}`;
     } else {
-      message = `${userMention(oldState.member.user.id)} moved from ${channelMention(oldState.channelId)} to ${channelMention(newState.channelId)}`;
+      message += ` ${userMention(oldState.member.user.id)} moved from ${channelMention(oldState.channelId)} to ${channelMention(newState.channelId)}`;
     }
     client.channels.cache.get(Config.discord.channel_id).send(message);
   });
