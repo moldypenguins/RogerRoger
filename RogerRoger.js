@@ -192,6 +192,17 @@ DB.connection.once("open", async () => {
     }
   });
 
+  client.on('voiceStateUpdate', (oldState, newState) => {
+    // check for bot
+    if (oldState.member.user.bot) return;
+
+    // the rest of your code
+    console.log("OLD: ", util.inspect(oldState, true, 2, true));
+    console.log("NEW: ", util.inspect(newState, true, 2, true));
+
+    
+  });
+
   client.on(Events.InteractionCreate, async (interaction) => {
     if(
       !interaction.isChatInputCommand() && 
