@@ -223,7 +223,7 @@ export default {
               },
               fields: [{
                   name:"",
-                  value: `**${_stockpile.stockpile_code}**`,
+                  value: `${_stockpile.stockpile_code}`,
                   inline: true
                 },
                 {
@@ -266,7 +266,7 @@ export default {
           let _embed = EmbedBuilder.from(interaction.message.embeds[0]);
           _embed.fields = [{
             name:"",
-            value: `**${_stockpile.stockpile_code}**`,
+            value: `${_stockpile.stockpile_code}`,
             inline: true
           },
           {
