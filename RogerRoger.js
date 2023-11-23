@@ -130,7 +130,7 @@ DB.connection.once("open", async () => {
                 },
                 {
                   name:"",
-                  value: `EXPIRES: *${time(_refresh, "R")}*`,
+                  value: `*Expires ${time(_refresh, "R")}*`,
                   inline: true
                 }
 
