@@ -232,7 +232,7 @@ DB.connection.once("open", async () => {
     //send message to welcome chan
     client.channels.cache.get(_guild.guild_welcome).send({ 
       embeds: [{
-        color: 0x2B2D31,
+        color: 0xFDFD96,
         description: `Hey ${userMention(member.id)}.\nWelcome to **The Old Republic**!\n\n` 
         +"Thank you for picking **TOR** for your foxhole experience.\n"
         +`Message an ${roleMention('1099256574855360512')} or ${roleMention('549158076897427498')}\n`
