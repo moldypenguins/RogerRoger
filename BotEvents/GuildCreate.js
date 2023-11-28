@@ -19,7 +19,8 @@ export default {
       guild_logs: client.guilds.cache.first().systemChannel,
       guild_welcome: client.guilds.cache.first().systemChannel,
       guild_stockpiles: client.guilds.cache.first().systemChannel,
-      guild_message: "Welcome."
+      guild_message: "Welcome.",
+      guild_color: 0xdbd3b0
     }).save();
     
     //admin logging

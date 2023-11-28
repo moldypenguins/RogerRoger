@@ -12,7 +12,7 @@ export default {
     
     client.channels.cache.get(_guild.guild_welcome).send({ 
       embeds: [{
-        color: 0xdbd3b0, //c1bba3 + f4ebbc
+        color: _guild.guild_color,
         description: `${_guild.guild_message.replace(/\\n/g, "\n").replace(/{{user}}/i, `${userMention(member.id)}`)}`,
 
       }], 

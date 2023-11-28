@@ -34,7 +34,8 @@ let GuildSchema = new mongoose.Schema({
   guild_stockpiles:      {type:String},
   guild_welcome:         {type:String},
   guild_logs:            {type:String},
-  guild_message:         {type:String}
+  guild_message:         {type:String},
+  guild_color:           {type:Number}
 });
 
 export default mongoose.model("Guild", GuildSchema, "Guilds");
