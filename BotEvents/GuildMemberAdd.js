@@ -8,13 +8,14 @@ export default {
   name: Events.GuildMemberAdd,
   once: false,
   async execute(client, member) {
+    if (member.user.bot) { return; } //check if is bot
+
     let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
     
     client.channels.cache.get(_guild.guild_welcome).send({ 
       embeds: [{
         color: _guild.guild_color,
         description: `${_guild.guild_message.replace(/\\n/g, "\n").replace(/{{user}}/i, `${userMention(member.id)}`)}`,
-
       }], 
       ephemeral: false 
     });

@@ -8,8 +8,7 @@ export default {
   name: Events.VoiceStateUpdate,
   once: false,
   async execute(client, oldState, newState) {
-    //check for bot
-    if (oldState.member.user.bot) { return; }
+    if (oldState.member.user.bot) { return; } //check if is bot
 
     let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
 

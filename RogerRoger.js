@@ -187,11 +187,13 @@ DB.connection.once("open", async () => {
   }
 
 
-  client.on("messageCreate", (msg) => {
-    console.log("text: ", util.inspect(msg.cleanContent, true, null, true));
-    if(msg.channelId === Config.discord.channel_id && !msg.author.bot) {
+  client.on("messageCreate", async(msg) => {
+    /*
+    let _guild = await Guild.findOne({guild_id: Config.discord.guild_id});
+    if(msg.channelId === _guild.guild_logs && !msg.author.bot) {
       console.log("text: ", util.inspect(msg.cleanContent, true, null, true));
     }
+    */
   });
 
 
@@ -227,7 +229,8 @@ DB.connection.once("open", async () => {
   client.on(Events.ClientReady, async() => {
     console.log(`Discord: Logged in as ${client.user.username}!`);
     client.user.setActivity("your mother undress", { type: ActivityType.Watching });
-    //client.channels.cache.get(Config.discord.channel_id).send(`${client.user.username} reporting for duty!`);
+    //let _guild = await Guild.findOne({guild_id: Config.discord.guild_id});
+    //client.channels.cache.get(_guild.guild_logs).send(`${client.user.username} reporting for duty!`);
     Scheduler.addSimpleIntervalJob(new SimpleIntervalJob(
       { minutes: Config.timers.database, runImmediately: true },
       db_task,
