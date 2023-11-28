@@ -17,17 +17,16 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/gpl-3.0.html
  *
  * @name BotCommands.js
- * @version 2023-04-20
+ * @version 2023-11-28
  * @summary bot commands
  **/
 
-
+import setup from "./setup.js";
 import stockpiles from "./stockpiles.js";
 
-
 let BotCommands = {
+  setup,
   stockpiles
 };
 
 export default BotCommands;
-

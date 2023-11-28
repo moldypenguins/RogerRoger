@@ -8,7 +8,8 @@ export default {
   name: Events.GuildMemberRemove,
   once: false,
   async execute(client, member) {
+    let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
     //admin logging
-    client.channels.cache.get(Config.discord.channel_id).send(`GuildMemberAdd: ${userMention(member.id)} joined the server.`);
+    client.channels.cache.get(_guild.guild_logs).send(`GuildMemberAdd: ${userMention(member.id)} joined the server.`);
   },
 };

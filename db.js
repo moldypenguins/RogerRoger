@@ -26,6 +26,7 @@ import mongoose from "mongoose";
 import Config from "./config.js";
 import Guild from "./Models/Guild.js";
 import Stockpile from "./Models/Stockpile.js";
+import Town from "./Models/Town.js";
 import User from "./Models/User.js";
 
 mongoose.set("strictQuery", true);
@@ -41,5 +42,6 @@ export {
   mongoose as DB,
   Guild,
   Stockpile,
+  Town,
   User
 };

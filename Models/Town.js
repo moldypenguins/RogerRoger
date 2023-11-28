@@ -1,7 +1,7 @@
 "use strict";
 /**
- * Gandalf
- * Copyright (c) 2020 Gandalf Planetarion Tools
+ * RogerRoger
+ * Copyright (c) 2023 The Old Republic - Craig Roberts
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,25 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see https://www.gnu.org/licenses/gpl-3.0.html
  *
- * @name Guild.js
- * @version 2022/11/11
+ * @name Town.js
+ * @version 2023/11/28
  * @summary Mongoose Model
  **/
 
 
 import mongoose from "mongoose";
 
-let GuildSchema = new mongoose.Schema({
-  _id:                   {type:mongoose.Schema.Types.ObjectId, required:true},
-  guild_id:              {type:String, unique:true, required:true},
-  guild_ownerId:         {type:String, required:true},
-  guild_name:            {type:String},
-  guild_description:     {type:String},
-  guild_faction:         {type:String},
-  guild_stockpiles:      {type:String},
-  guild_welcome:         {type:String},
-  guild_logs:            {type:String},
-  guild_message:         {type:String}
+let TownSchema = new mongoose.Schema({
+  _id:           {type:mongoose.Schema.Types.ObjectId, required:true},
+  town_hex:      {type:String, required:true},
+  town_name:     {type:String, required:true},
+  town_building: {type:String, required:true},
+  town_faction:  {type:String, required:true},
 });
 
-export default mongoose.model("Guild", GuildSchema, "Guilds");
+export default mongoose.model("Town", TownSchema, "Towns");

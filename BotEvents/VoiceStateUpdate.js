@@ -11,6 +11,8 @@ export default {
     //check for bot
     if (oldState.member.user.bot) { return; }
 
+    let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
+
     let message = null;
     let color = null; 
     if (newState.channelId === null) {
@@ -24,7 +26,7 @@ export default {
       color = 0xFFB347;
     }
     if(message && color) {
-      client.channels.cache.get(Config.discord.channel_id).send({embeds: [
+      client.channels.cache.get(_guild.guild_logs).send({embeds: [
         {
           color: color,
           description: message,

@@ -188,6 +188,7 @@ DB.connection.once("open", async () => {
 
 
   client.on("messageCreate", (msg) => {
+    console.log("text: ", util.inspect(msg.cleanContent, true, null, true));
     if(msg.channelId === Config.discord.channel_id && !msg.author.bot) {
       console.log("text: ", util.inspect(msg.cleanContent, true, null, true));
     }

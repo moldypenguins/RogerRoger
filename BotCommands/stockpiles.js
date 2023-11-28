@@ -17,7 +17,7 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/gpl-3.0.html
  *
  * @name stockpiles.js
- * @version 2023/04/20
+ * @version 2023/11/28
  * @summary RogerRoger command
  **/
 
@@ -56,19 +56,8 @@ export default {
             .setMaxLength(6)))
     .addSubcommand(subcommand =>
       subcommand
-        .setName("delete")
-        .setDescription("Delete a stockpile."))
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName("channel")
-        .setDescription("Set the channel to post stockpiles to.")
-        .addChannelOption(option =>
-          option
-            .setName("channel")
-            .setDescription("The channel to post to")
-            .addChannelTypes(ChannelType.GuildText)
-            .setRequired(true))),
-
+        .setName("list")
+        .setDescription("Lists stockpiles.")),
   async execute(client, interaction) {
     //console.log(`INT: ${util.inspect(interaction, true, 2, true)}`);
     let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
@@ -103,11 +92,6 @@ export default {
             { name: "", value: `**Code:** ${_code}`, inline: false }
           ]
         }], components: [new ActionRowBuilder().addComponents(select)], ephemeral: false });
-
-      } else if(_subcommand == "channel") {
-        let _channel = interaction.options.getChannel("channel").id;
-        await Guild.updateOne({ guild_id: Config.discord.guild_id }, { $set: { guild_stockpiles: _channel } });
-        interaction.reply({ content: `Set ${channelMention(_channel)} as the stockpiles channel.`, ephemeral: true });
 
       }
       

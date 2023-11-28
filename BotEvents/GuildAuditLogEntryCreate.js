@@ -3,11 +3,13 @@
 import Config from "../config.js";
 import { AuditLogEvent, Events, userMention, roleMention, channelMention } from "discord.js";
 import util from "util";
+import { Guild } from "../db.js";
 
 export default {
   name: Events.GuildAuditLogEntryCreate,
   once: false,
   async execute(client, entry) {
+    let _guild = await Guild.findOne({guild_id: Config.discord.guild_id});
     //console.log(`ENTRY: ${util.inspect(entry.changes[0], true, 3, true)}`);
     
     let audit_message = `Unhandled action (${entry.action}).`;
@@ -328,6 +330,6 @@ export default {
 
 
 
-    client.channels.cache.get(Config.discord.channel_id).send(audit_message);
+    client.channels.cache.get(_guild.guild_logs).send(audit_message);
   },
 };
