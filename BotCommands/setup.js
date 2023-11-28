@@ -105,11 +105,7 @@ export default {
               { name: 'Colonial', value: 'Colonial' },
               { name: 'Warden', value: 'Warden' }
             )
-          ))
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName("test")
-        .setDescription("Test.")),
+          )),
    
   async execute(client, interaction) {
     //console.log(`INT: ${util.inspect(interaction, true, 2, true)}`);
@@ -144,21 +140,7 @@ export default {
         await Guild.updateOne({ guild_id: Config.discord.guild_id }, { $set: { guild_faction: _faction } });
         interaction.reply({ content: `Set guild faction.`, ephemeral: true });
 
-      } else if(_subcommand == "test") {
-        let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
-        
-
-        
-
-      
-  
-        interaction.reply({ embeds: [{
-          color: _guild.guild_color,
-          description: `${_guild.guild_message.replace(/\\n/g, "\n")}`,
-  
-        }], ephemeral: false });
-  
-      }
+      } 
       
     }
 
