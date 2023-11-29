@@ -234,8 +234,8 @@ export default {
           _refresh.setDate(_refresh.getDate() + 2);
 
           let _stockpile = await Stockpile.findOne({_id: _sid});
-          //console.log(`STOCK: ${util.inspect(_stockpile, true, null, true)}`);
-          let _embed = EmbedBuilder.from(interaction.message.embeds[0]);
+          //console.log(`STOCK: ${util.inspect(interaction.message.embeds[0], true, null, true)}`);
+          let _embed = EmbedBuilder.from(interaction.message.embeds[0]).data;
           _embed.fields = [{
             name:"",
             value: `${_stockpile.stockpile_code}`,
@@ -253,7 +253,6 @@ export default {
           return interaction.deferUpdate();
 
         }
-
 
       } else if(_command == "delete") {
         let _sid = interaction.customId.split("_")[2];
@@ -280,7 +279,7 @@ export default {
 
         if(_action == "yes") {
           let _guild = await Guild.findOne({ guild_id: interaction.guildId });
-          
+
           if(_guild?.guild_stockpiles && await Stockpile.exists({_id: _sid})) {
             //console.log(`SID: ${util.inspect(interaction.message.id, true, 1, true)}`);
             let _stockpile = await Stockpile.findOne({_id: _sid});
@@ -295,6 +294,7 @@ export default {
 
         }
         interaction.deleteReply();
+
         return interaction.deferUpdate();
       }
 
