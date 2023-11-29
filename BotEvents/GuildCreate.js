@@ -16,14 +16,24 @@ export default {
       guild_ownerId: guild.ownerId,
       guild_name: guild.name,
       guild_description: guild.description,
-      guild_logs: client.guilds.cache.first().systemChannel,
-      guild_welcome: client.guilds.cache.first().systemChannel,
-      guild_stockpiles: client.guilds.cache.first().systemChannel,
+      guild_logs: guild.systemChannel.id,
+      guild_welcome: guild.systemChannel.id,
+      guild_stockpiles: guild.systemChannel.id,
       guild_message: "Welcome.",
       guild_color: 0xdbd3b0
     }).save();
-    
+
     //admin logging
-    client.channels.cache.get(_guild.guild_logs).send(`GuildCreate: joined guild ${guild.name} (${guild.id}).`);
+    client.channels.cache.get(_guild.guild_logs).send({embeds: [
+      {
+        color: 0x77DD77,
+        description: `Joined guild ${guild.name} (${guild.id}).`,
+        author: {
+          name: 'Guild Create',
+          icon_url: 'https://i.imgur.com/LykmYQV.png'
+        },
+      }
+    ]});
+
   },
 };

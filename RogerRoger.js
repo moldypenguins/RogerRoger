@@ -94,18 +94,17 @@ DB.connection.once("open", async () => {
   let db_task = new AsyncTask("DBTask", async() => {
     console.log("DBJob running DBTask");
 
-    if(await Guild.exists({ guild_id: Config.discord.guild_id })) {
-      let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
-
+    let _guilds = await Guild.find();
+    for(let _id in _guilds) {
       //update stockpile codes
-      if(_guild?.guild_stockpiles) {
+      if(_guilds[_id].guild_stockpiles) {
         
         let _stockpiles = await Stockpile.find();
         for(let _s in _stockpiles) {
           //delete old message
           if(_stockpiles[_s].stockpile_post) {
             try {
-              await client.channels.cache.get(_guild.guild_stockpiles).messages.fetch(_stockpiles[_s].stockpile_post).then(message => message.delete());
+              await client.channels.cache.get(_guilds[_id].guild_stockpiles).messages.fetch(_stockpiles[_s].stockpile_post).then(message => message.delete());
             } 
             catch(err) {
               console.log(`Error: ${err}`);
@@ -116,7 +115,7 @@ DB.connection.once("open", async () => {
           _refresh.setDate(_refresh.getDate() + 2);
 
           //send new message
-          client.channels.cache.get(_guild.guild_stockpiles).send({ 
+          client.channels.cache.get(_guilds[_id].guild_stockpiles).send({ 
             embeds: [{
               color: 0x2B2D31,
               author: {
@@ -158,7 +157,7 @@ DB.connection.once("open", async () => {
   
 
 
-
+  
   let dsCommands = new Collection();
   for(let [name, command] of Object.entries(BotCommands)) {
     if(BotCommands[name]) {
@@ -175,27 +174,15 @@ DB.connection.once("open", async () => {
   }
   client.commands = dsCommands;
 
-
   //handle discord events
   for (const ev in BotEvents) {
     //console.error(`HERE: ${util.inspect(BotEvents[ev], true, null, true)}`);
-    if (BotEvents[ev].once) {
+    if(BotEvents[ev].once) {
       client.once(BotEvents[ev].name, (...args) => BotEvents[ev].execute(client, ...args));
     } else {
       client.on(BotEvents[ev].name, (...args) => BotEvents[ev].execute(client, ...args));
     }
   }
-
-
-  client.on("messageCreate", async(msg) => {
-    /*
-    let _guild = await Guild.findOne({guild_id: Config.discord.guild_id});
-    if(msg.channelId === _guild.guild_logs && !msg.author.bot) {
-      console.log("text: ", util.inspect(msg.cleanContent, true, null, true));
-    }
-    */
-  });
-
 
   client.on(Events.InteractionCreate, async (interaction) => {
     if(
@@ -206,8 +193,6 @@ DB.connection.once("open", async () => {
       !interaction.isRoleSelectMenu() && 
       !interaction.isModalSubmit()
     ) { return; }
-
-    //console.log(interaction);
 
     const command = interaction.isChatInputCommand() ? interaction.client.commands.get(interaction.commandName) : interaction.client.commands.get(interaction.customId.split("_")[0]);
 
@@ -229,7 +214,7 @@ DB.connection.once("open", async () => {
   client.on(Events.ClientReady, async() => {
     console.log(`Discord: Logged in as ${client.user.username}!`);
     client.user.setActivity("your mother undress", { type: ActivityType.Watching });
-    //let _guild = await Guild.findOne({guild_id: Config.discord.guild_id});
+    //let _guild = await Guild.findOne({guild_id: interaction.guildId});
     //client.channels.cache.get(_guild.guild_logs).send(`${client.user.username} reporting for duty!`);
     Scheduler.addSimpleIntervalJob(new SimpleIntervalJob(
       { minutes: Config.timers.database, runImmediately: true },

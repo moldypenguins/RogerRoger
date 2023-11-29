@@ -21,10 +21,13 @@
  * @summary bot commands
  **/
 
+import rolereaction from "./rolereaction.js";
 import setup from "./setup.js";
 import stockpiles from "./stockpiles.js";
 
+
 let BotCommands = {
+  rolereaction,
   setup,
   stockpiles
 };

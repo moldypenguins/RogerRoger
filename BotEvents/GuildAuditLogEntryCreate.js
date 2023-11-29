@@ -9,9 +9,8 @@ export default {
   name: Events.GuildAuditLogEntryCreate,
   once: false,
   async execute(client, entry) {
-    let _guild = await Guild.findOne({guild_id: Config.discord.guild_id});
-    //console.log(`ENTRY: ${util.inspect(entry.changes[0], true, 3, true)}`);
-    
+
+    let _guildId = Config.discord.guild_id;
     let audit_message = `Unhandled action (${entry.action}).`;
 
     switch (entry.action) {
@@ -155,7 +154,7 @@ export default {
         audit_message = `MemberRoleUpdate: ${roleMention(entry.changes[0].new[0].id)} was removed to ${userMention(entry.targetId)} by ${userMention(entry.executorId)}.`;
         break;
       }
-      break;
+      break; 
 
 
     case AuditLogEvent.MemberUpdate:
@@ -327,9 +326,9 @@ export default {
     }
 
 
-
-
-
-    client.channels.cache.get(_guild.guild_logs).send(audit_message);
+    if(_guildId) {
+      let _guild = await Guild.findOne({guild_id: _guildId});
+      client.channels.cache.get(_guild.guild_logs).send(audit_message);
+    }
   },
 };

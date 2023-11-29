@@ -31,7 +31,7 @@ export default {
           description: message,
           author: {
             name: 'Voice State Update',
-            icon_url: 'https://i.imgur.com/aH8d7IZ.png'
+            icon_url: 'https://i.imgur.com/w58gdx3.png'
           },
         }
       ]});

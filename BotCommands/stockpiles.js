@@ -23,7 +23,7 @@
 
 import util from "util";
 import Config from "../config.js";
-import { DB, Guild, Stockpile } from "../db.js";
+import { DB, Guild, Stockpile, Town } from "../db.js";
 import { ActionRowBuilder, PermissionFlagsBits, ButtonStyle, ChannelType, time, EmbedBuilder, ChannelSelectMenuBuilder, RoleSelectMenuBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, roleMention, channelMention, userMention, ButtonBuilder, InteractionResponse, Integration } from "discord.js";
 
 import { encode } from "html-entities";
@@ -60,23 +60,18 @@ export default {
         .setDescription("Lists stockpiles.")),
   async execute(client, interaction) {
     //console.log(`INT: ${util.inspect(interaction, true, 2, true)}`);
-    let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
+    let _guild = await Guild.findOne({ guild_id: interaction.guildId });
 
     if (interaction.isChatInputCommand()) {
-      let _subcommand = interaction.options._subcommand;
-      if(_subcommand == "add") {
+      if(interaction.options._subcommand == "add") {
         let _code = interaction.options.getString("code");
 
         let _options = [];
-        for(let _hex in Config.foxhole) {
-          //console.log(`HEX: ${util.inspect(Config.foxhole[_hex], true, null, true)}`);
-          if(Config.foxhole[_hex].faction == _guild.guild_faction) {
-            _options.push(new StringSelectMenuOptionBuilder({
-              label: `${Config.foxhole[_hex].name}`, 
-              value: `${_hex}`
-            }));
-          }
+        let _hexes = await Town.distinct('town_hex', { town_faction: _guild.guild_faction });
+        for(let _id in _hexes) {
+          _options.push(new StringSelectMenuOptionBuilder({ label: `${_hexes[_id]}`, value: `${_hexes[_id]}` }));
         }
+
         const select = new StringSelectMenuBuilder()
           .setCustomId("stockpiles_add_hex")
           .setPlaceholder("Select hex");
@@ -103,17 +98,14 @@ export default {
       if(_command == "add") {
         if(_field == "hex") {
           let _hex = interaction.values[0];
-
-          interaction.message.embeds[0].fields[0].value = `**Hex:** ${Config.foxhole[_hex].name}`;
+          interaction.message.embeds[0].fields[0].value = `**Hex:** ${_hex}`;
 
           let _options = [];
-          for(let _town in Config.foxhole[_hex].towns) {
-            //console.log(`TOWN: ${util.inspect(Config.foxhole[_hex].towns[_town], true, null, true)}`);
-            _options.push(new StringSelectMenuOptionBuilder({
-              label: `${Config.foxhole[_hex].towns[_town].name}`, 
-              value: `${_town}`
-            }));
+          let _towns = await Town.distinct('town_name', { town_hex: _hex });
+          for(let _id in _towns) {
+            _options.push(new StringSelectMenuOptionBuilder({ label: `${_towns[_id]}`, value: `${_towns[_id]}` }));
           }
+
           const select = new StringSelectMenuBuilder()
             .setCustomId("stockpiles_add_town")
             .setPlaceholder("Select town");
@@ -123,21 +115,16 @@ export default {
           return interaction.deferUpdate();
         
         } else if(_field == "town") {
-          let _hex = Config.foxhole.map(h => h.name).indexOf(interaction.message.embeds[0].fields[0].value.replace("**Hex:** ",""));
+          let _hex = interaction.message.embeds[0].fields[0].value.replace("**Hex:** ","");
           let _town = interaction.values[0];
-
-          console.log(`HEX: ${util.inspect(Config.foxhole, true, null, true)}`);
-
-          interaction.message.embeds[0].fields[1].value = `**Town:** ${Config.foxhole[_hex].towns[_town].name}`;
+          interaction.message.embeds[0].fields[1].value = `**Town:** ${_town}`;
 
           let _options = [];
-          for(let _building in Config.foxhole[_hex].towns[_town].buildings) {
-            //console.log(`BUILDING: ${util.inspect(Config.foxhole[_hex].towns[_town].buildings[_building], true, null, true)}`);
-            _options.push(new StringSelectMenuOptionBuilder({
-              label: `${Config.foxhole[_hex].towns[_town].buildings[_building]}`, 
-              value: `${_building}`
-            }));
+          let _buildings = await Town.distinct('town_building', { town_hex: _hex, town_name: _town });
+          for(let _id in _buildings) {
+            _options.push(new StringSelectMenuOptionBuilder({ label: `${_buildings[_id]}`, value: `${_buildings[_id]}` }));
           }
+
           const select = new StringSelectMenuBuilder()
             .setCustomId("stockpiles_add_building")
             .setPlaceholder("Select building");
@@ -148,11 +135,11 @@ export default {
           
         } else if(_field == "building") {
           
-          let _hex = Config.foxhole.map(h => h.name).indexOf(interaction.message.embeds[0].fields[0].value.replace("**Hex:** ",""));
-          let _town = Config.foxhole[_hex].towns.map(t => t.name).indexOf(interaction.message.embeds[0].fields[1].value.replace("**Town:** ",""));
+          let _hex = interaction.message.embeds[0].fields[0].value.replace("**Hex:** ","");
+          let _town = interaction.message.embeds[0].fields[1].value.replace("**Town:** ","");
           let _building = interaction.values[0];
 
-          interaction.message.embeds[0].fields[2].value = `**Building:** ${Config.foxhole[_hex].towns[_town].buildings[_building]}`;
+          interaction.message.embeds[0].fields[2].value = `**Building:** ${_building}`;
 
           const save = new ButtonBuilder()
             .setCustomId("stockpiles_add_save")
@@ -191,7 +178,7 @@ export default {
             stockpile_code: _code
           }).save();
 
-          //let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
+          //let _guild = await Guild.findOne({ guild_id: interaction.guildId });
 
           let _refresh = new Date(_stockpile.stockpile_refresh);
           _refresh.setDate(_refresh.getDate() + 2);
@@ -293,7 +280,7 @@ export default {
         let _sid = new DB.Types.ObjectId(interaction.customId.split("_")[3]);
 
         if(_action == "yes") {
-          let _guild = await Guild.findOne({ guild_id: Config.discord.guild_id });
+          let _guild = await Guild.findOne({ guild_id: interaction.guildId });
 
           console.log(`GUILD: ${util.inspect(await Stockpile.exists({_id: _sid}), true, 1, true)}`);
 
@@ -306,14 +293,11 @@ export default {
               await client.channels.cache.get(_guild.guild_stockpiles).messages.fetch(_stockpile.stockpile_post).then(message => message.delete());
             }
             await Stockpile.deleteOne({_id: _sid});
-
-            return interaction.deferUpdate();
-          } else {
-            return interaction.deferUpdate();
           }
-        } else {
-          return interaction.deferUpdate();
         }
+
+        await interaction.deleteReply();
+        return interaction.deferUpdate();
       }
 
 
