@@ -26,6 +26,7 @@ import mongoose from "mongoose";
 
 let StockpileSchema = new mongoose.Schema({
   _id:                {type:mongoose.Schema.Types.ObjectId, required:true},
+  stockpile_guild:    {type:String, required:true},
   stockpile_hex:      {type:String, required:true},
   stockpile_town:     {type:String, required:true},
   stockpile_building: {type:String, required:true},

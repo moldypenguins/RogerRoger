@@ -99,7 +99,7 @@ DB.connection.once("open", async () => {
       //update stockpile codes
       if(_guilds[_id].guild_stockpiles) {
         
-        let _stockpiles = await Stockpile.find();
+        let _stockpiles = await Stockpile.find({stockpile_guild: _guilds[_id].guild_id});
         for(let _s in _stockpiles) {
           //delete old message
           if(_stockpiles[_s].stockpile_post) {

@@ -172,6 +172,7 @@ export default {
         if(_field == "save") {
           let _stockpile = await new Stockpile({
             _id: new DB.Types.ObjectId(),
+            stockpile_guild: _guild.guild_id,
             stockpile_hex: _hex,
             stockpile_town: _town,
             stockpile_building: _building,

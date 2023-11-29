@@ -19,7 +19,7 @@ export default {
       guild_logs: guild.systemChannel.id,
       guild_welcome: guild.systemChannel.id,
       guild_stockpiles: guild.systemChannel.id,
-      guild_message: "Welcome.",
+      guild_message: "Welcome {{user}}.",
       guild_color: 0xdbd3b0
     }).save();
 
