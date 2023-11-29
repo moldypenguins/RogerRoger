@@ -271,9 +271,7 @@ export default {
         interaction.reply({ embeds: [{
           color: 0x0099FF,
           title: "Are you sure?",
-          fields:[]
-        }], components: [new ActionRowBuilder().addComponents(yes, no)], ephemeral: true });
-
+        }], components: [new ActionRowBuilder().addComponents(yes, no)], ephemeral: false });
 
 
       } else if(_command == "confirm") {
@@ -282,22 +280,21 @@ export default {
 
         if(_action == "yes") {
           let _guild = await Guild.findOne({ guild_id: interaction.guildId });
-
-          console.log(`GUILD: ${util.inspect(await Stockpile.exists({_id: _sid}), true, 1, true)}`);
-
+          
           if(_guild?.guild_stockpiles && await Stockpile.exists({_id: _sid})) {
-
-            console.log(`SID: ${util.inspect(_sid, true, 1, true)}`);
-
+            //console.log(`SID: ${util.inspect(interaction.message.id, true, 1, true)}`);
             let _stockpile = await Stockpile.findOne({_id: _sid});
             if(_stockpile.stockpile_post) {
-              await client.channels.cache.get(_guild.guild_stockpiles).messages.fetch(_stockpile.stockpile_post).then(message => message.delete());
+              await client.channels.cache.get(_guild.guild_stockpiles).messages.fetch(_stockpile.stockpile_post)
+                .then(async(message) => { 
+                  message.delete();
+                  await Stockpile.deleteOne({_id: _sid});
+                });
             }
-            await Stockpile.deleteOne({_id: _sid});
           }
-        }
 
-        await interaction.deleteReply();
+        }
+        interaction.deleteReply();
         return interaction.deferUpdate();
       }
 
