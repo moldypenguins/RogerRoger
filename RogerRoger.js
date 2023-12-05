@@ -24,7 +24,6 @@
 
 
 import util from "util";
-import nodemon from 'nodemon';
 
 import Config from "./config.js";
 import { DB, Guild, Stockpile } from "./db.js";
