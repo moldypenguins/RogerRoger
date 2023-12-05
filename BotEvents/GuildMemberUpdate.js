@@ -9,10 +9,10 @@ export default {
   name: Events.GuildMemberUpdate,
   once: false,
   async execute(client, oldMember, newMember) {
-    let _guild = await Guild.findOne({ guild_id: member.guild.id });
-
     console.log(`OLD: ${util.inspect(oldMember, true, 1, true)}`);
     console.log(`NEW: ${util.inspect(newMember, true, 1, true)}`);
+
+    let _guild = await Guild.findOne({ guild_id: oldMember.guild.id });
 
     let _reply = "";
     if(oldMember.name != newMember.name) {
