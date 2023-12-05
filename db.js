@@ -21,9 +21,9 @@
  * @summary Database
  **/
 
-
-import mongoose from "mongoose";
 import Config from "./config.js";
+import mongoose from "mongoose";
+import Event from "./Models/Event.js";
 import Guild from "./Models/Guild.js";
 import Stockpile from "./Models/Stockpile.js";
 import Town from "./Models/Town.js";
@@ -40,6 +40,7 @@ mongoose.connection.once("open", () => console.log("Database loaded."));
 
 export {
   mongoose as DB,
+  Event,
   Guild,
   Stockpile,
   Town,

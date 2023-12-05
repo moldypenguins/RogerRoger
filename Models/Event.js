@@ -27,12 +27,7 @@ import mongoose from "mongoose";
 let EventSchema = new mongoose.Schema({
   _id:               {type:mongoose.Schema.Types.ObjectId, required:true},
   event_guild:       {type:String, required:true},
-  event_channel:     {type:String, required:true},
-  event_title:       {type:String, required:true},
-  event_description: {type:String, required:true},
   event_start:       {type:Date, required:true},
-  event_end:         {type:Date, required:true},
-  event_role:        {type:String},
   event_post:        {type:String},
 });
 

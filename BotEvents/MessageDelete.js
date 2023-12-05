@@ -32,18 +32,20 @@ export default {
   once: false,
   async execute(client, message) {
     //console.log(`DELETE: ${util.inspect(message, true, 1, true)}`);
-    let _guild = await Guild.findOne({ guild_id: message.guildId });
+    if(!message.author.bot && message.author.id != Config.discord.client_id) {
+      let _guild = await Guild.findOne({ guild_id: message.guildId });
 
-    //admin logging
-    client.channels.cache.get(_guild.guild_logs).send({embeds: [
-      {
-        color: 0xFF6961,
-        description: `A message from **${userMention(message.author.id)}** was deleted in ${channelMention(message.channelId)}.`,
-        author: {
-          name: 'Message Deleted',
-          icon_url: 'https://i.imgur.com/kS0D3Nc.png'
-        },
-      }
-    ]});
-  },
+      //admin logging
+      client.channels.cache.get(_guild.guild_logs).send({embeds: [
+        {
+          color: 0xFF6961,
+          description: `A message from **${userMention(message.author.id)}** was deleted in ${channelMention(message.channelId)}.`,
+          author: {
+            name: 'Message Deleted',
+            icon_url: 'https://i.imgur.com/kS0D3Nc.png'
+          },
+        }
+      ]});
+    }
+  }
 };
