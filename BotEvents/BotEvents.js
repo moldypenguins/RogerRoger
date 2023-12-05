@@ -29,6 +29,7 @@ import GuildCreate from "./GuildCreate.js";
 import GuildMemberAdd from "./GuildMemberAdd.js";
 import GuildMemberRemove from "./GuildMemberRemove.js";
 import GuildMemberUpdate from "./GuildMemberUpdate.js";
+import MessageDelete from "./MessageDelete.js";
 import VoiceStateUpdate from "./VoiceStateUpdate.js";
 
 
@@ -40,6 +41,7 @@ let BotEvents = {
   GuildMemberAdd,
   GuildMemberRemove,
   GuildMemberUpdate,
+  MessageDelete,
   VoiceStateUpdate
 };
 
