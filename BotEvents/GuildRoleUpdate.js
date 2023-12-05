@@ -51,6 +51,9 @@ export default {
           name: `Guild Role Update`,
           icon_url: 'https://i.imgur.com/SrvV95U.png'
         },
+        fields: [
+          
+        ]
       }
     ]});
   },

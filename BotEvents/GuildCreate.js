@@ -20,7 +20,7 @@ export default {
       guild_welcome: guild.systemChannel.id,
       guild_stockpiles: guild.systemChannel.id,
       guild_message: "Welcome {{user}}.",
-      guild_colour: 0xdbd3b0
+      guild_color: 0xdbd3b0
     }).save();
 
     //admin logging

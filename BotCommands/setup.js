@@ -84,11 +84,11 @@ export default {
           ))
     .addSubcommand(subcommand =>
       subcommand
-        .setName("colour")
-        .setDescription("Set the message colour.")
+        .setName("color")
+        .setDescription("Set the message color.")
         .addStringOption(option =>
-          option.setName('colour')
-            .setDescription('The colour to set.')
+          option.setName('color')
+            .setDescription('The color to set.')
             .setRequired(true)
             .setMinLength(6)
             .setMaxLength(6)
@@ -130,10 +130,10 @@ export default {
         await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_welcome: _channel, guild_message: _message } });
         interaction.reply({ content: `Set the welcome channel and message.`, ephemeral: true });
 
-      } else if(_subcommand == "colour") {
-        let _colour = interaction.options.getString("colour");
-        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_colour: parseInt(_colour, 16) } });
-        interaction.reply({ content: `Set guild message colour.`, ephemeral: true });
+      } else if(_subcommand == "color") {
+        let _color = interaction.options.getString("color");
+        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_color: parseInt(_color, 16) } });
+        interaction.reply({ content: `Set guild message color.`, ephemeral: true });
 
       } else if(_subcommand == "faction") {
         let _faction = interaction.options.getString("faction");

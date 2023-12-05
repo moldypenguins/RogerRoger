@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see https://www.gnu.org/licenses/gpl-3.0.html
  *
- * @name stockpiles.js
+ * @name stockpile.js
  * @version 2023/11/28
  * @summary RogerRoger command
  **/
@@ -39,56 +39,41 @@ dayjs.extend(timezone);
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("stockpiles")
-    .setDescription("Configure stockpiles.")
+    .setName("stockpile")
+    .setDescription("Add a new stockpile.")
     .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName("add")
-        .setDescription("Add a stockpile.")
-        .addStringOption(option => 
-          option
-            .setName("code")
-            .setDescription("The stockpile code.")
-            .setRequired(true)
-            .setMinLength(6)
-            .setMaxLength(6)))
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName("list")
-        .setDescription("Lists stockpiles.")),
+    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages),
   async execute(client, interaction) {
     //console.log(`INT: ${util.inspect(interaction, true, 2, true)}`);
     let _guild = await Guild.findOne({ guild_id: interaction.guildId });
 
     if (interaction.isChatInputCommand()) {
-      if(interaction.options._subcommand == "add") {
-        let _code = interaction.options.getString("code");
 
-        let _options = [];
-        let _hexes = await Town.distinct('town_hex', { town_faction: _guild.guild_faction });
-        for(let _id in _hexes) {
-          _options.push(new StringSelectMenuOptionBuilder({ label: `${_hexes[_id]}`, value: `${_hexes[_id]}` }));
-        }
+      let _code = interaction.options.getString("code");
 
-        const select = new StringSelectMenuBuilder()
-          .setCustomId("stockpiles_add_hex")
-          .setPlaceholder("Select hex");
-        select.options = _options;
-
-        interaction.reply({ embeds: [{
-          color: 0x2B2D31,
-          title: "Add Stockpile",
-          fields: [
-            { name: "", value: "**Hex:**", inline: false },
-            { name: "", value: "**Town:**", inline: false },
-            { name: "", value: "**Building:**", inline: false },
-            { name: "", value: `**Code:** ${_code}`, inline: false }
-          ]
-        }], components: [new ActionRowBuilder().addComponents(select)], ephemeral: false });
-
+      let _options = [];
+      let _hexes = await Town.distinct('town_hex', { town_faction: _guild.guild_faction });
+      for(let _id in _hexes) {
+        _options.push(new StringSelectMenuOptionBuilder({ label: `${_hexes[_id]}`, value: `${_hexes[_id]}` }));
       }
+
+      const select = new StringSelectMenuBuilder()
+        .setCustomId("stockpiles_add_hex")
+        .setPlaceholder("Select hex");
+      select.options = _options;
+
+      interaction.reply({ embeds: [{
+        color: 0x2B2D31,
+        title: "Add Stockpile",
+        fields: [
+          { name: "", value: "**Hex:**", inline: false },
+          { name: "", value: "**Town:**", inline: false },
+          { name: "", value: "**Building:**", inline: false },
+          { name: "", value: `**Code:** ${_code}`, inline: false }
+        ]
+      }], components: [new ActionRowBuilder().addComponents(select)], ephemeral: false });
+
+      
       
     } else if(interaction.isStringSelectMenu()) {
       //console.log(`CUSTOMID: ${util.inspect(interaction.customId, true, 1, true)}`);
