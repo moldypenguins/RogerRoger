@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see https://www.gnu.org/licenses/gpl-3.0.html
  *
- * @name GuildBanRemove.js
+ * @name GuildRoleDelete.js
  * @version 2023-12-05
  * @summary bot events
  **/
@@ -28,20 +28,20 @@ import { DB, Guild } from "../db.js";
 import { ActivityType, Events, userMention, roleMention, channelMention } from "discord.js";
 
 export default {
-  name: Events.GuildBanRemove,
+  name: Events.GuildRoleDelete,
   once: false,
-  async execute(client, ban) {
-    //console.log(`BAN: ${util.inspect(ban, true, 1, true)}`);
-    let _guild = await Guild.findOne({ guild_id: ban.guild.id });
+  async execute(client, role) {
+    console.log(`ROLE: ${util.inspect(role, true, 1, true)}`);
+    let _guild = await Guild.findOne({ guild_id: role.guild.id });
 
     //admin logging
     client.channels.cache.get(_guild.guild_logs).send({embeds: [
       {
-        color: 0x77DD77,
-        description: `**${ban.member.nickname}** was unbanned.`,
+        color: 0xFF6961,
+        description: `**${role.name}** was Deleted.`,
         author: {
-          name: 'Guild Ban Remove',
-          icon_url: 'https://i.imgur.com/SvSOrZ8.png'
+          name: 'Role Delete',
+          icon_url: 'https://i.imgur.com/k6BWltM.png'
         },
       }
     ]});

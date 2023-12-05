@@ -13,7 +13,7 @@ export default {
     //admin logging
     client.channels.cache.get(_guild.guild_logs).send({embeds: [
       {
-        color: 0x77DD77,
+        color: 0xFF6961,
         description: `${userMention(member.id)} left the server.`,
         author: {
           name: 'Guild Member Remove',

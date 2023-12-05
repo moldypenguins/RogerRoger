@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see https://www.gnu.org/licenses/gpl-3.0.html
  *
- * @name GuildBanRemove.js
+ * @name GuildRoleUpdate.js
  * @version 2023-12-05
  * @summary bot events
  **/
@@ -28,20 +28,28 @@ import { DB, Guild } from "../db.js";
 import { ActivityType, Events, userMention, roleMention, channelMention } from "discord.js";
 
 export default {
-  name: Events.GuildBanRemove,
+  name: Events.GuildRoleUpdate,
   once: false,
-  async execute(client, ban) {
-    //console.log(`BAN: ${util.inspect(ban, true, 1, true)}`);
-    let _guild = await Guild.findOne({ guild_id: ban.guild.id });
+  async execute(client, oldRole, newRole) {
+    //console.log(`OLD: ${util.inspect(oldRole, true, 1, true)}`);
+    //console.log(`NEW: ${util.inspect(newRole, true, 1, true)}`);
+    let _guild = await Guild.findOne({ guild_id: oldRole.guild.id });
 
+    let _reply = [];
+    if(oldRole.name != newRole.name) {
+      _reply.push(`Name: **${oldRole.name}** was changed to **${newRole.name}**`);
+    }
+    if(oldRole.color != newRole.color) {
+      _reply.push(`Color: **${oldRole.color}** was changed to **${newRole.color}**`);
+    }
     //admin logging
     client.channels.cache.get(_guild.guild_logs).send({embeds: [
       {
-        color: 0x77DD77,
-        description: `**${ban.member.nickname}** was unbanned.`,
+        color: 0xFFB347,
+        description: _reply.join("\n"),
         author: {
-          name: 'Guild Ban Remove',
-          icon_url: 'https://i.imgur.com/SvSOrZ8.png'
+          name: `Guild Role Update`,
+          icon_url: 'https://i.imgur.com/SrvV95U.png'
         },
       }
     ]});
