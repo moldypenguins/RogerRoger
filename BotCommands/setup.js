@@ -68,7 +68,7 @@ export default {
     .addSubcommand(subcommand =>
       subcommand
         .setName("welcome")
-        .setDescription("Set the welcome channel and message.")
+        .setDescription("Set the welcome channel.")
         .addChannelOption(option =>
           option
             .setName("channel")
@@ -81,10 +81,14 @@ export default {
             .setDescription('The message to set.')
             .setRequired(true)
             .setMaxLength(2000) //ensure the text will fit in an embed description
-          )
+          ))
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName("colour")
+        .setDescription("Set the message colour.")
         .addStringOption(option =>
-          option.setName('color')
-            .setDescription('The color to set.')
+          option.setName('colour')
+            .setDescription('The colour to set.')
             .setRequired(true)
             .setMinLength(6)
             .setMaxLength(6)
@@ -123,13 +127,13 @@ export default {
       } else if(_subcommand == "welcome") {
         let _channel = interaction.options.getChannel("channel").id;
         let _message = interaction.options.getString("message");
-        let _color = interaction.options.getString("color");
-        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { 
-          guild_welcome: _channel,
-          guild_message: _message, 
-          guild_color: parseInt(_color, 16) 
-        } });
+        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_welcome: _channel, guild_message: _message } });
         interaction.reply({ content: `Set the welcome channel and message.`, ephemeral: true });
+
+      } else if(_subcommand == "colour") {
+        let _colour = interaction.options.getString("colour");
+        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_colour: parseInt(_colour, 16) } });
+        interaction.reply({ content: `Set guild message colour.`, ephemeral: true });
 
       } else if(_subcommand == "faction") {
         let _faction = interaction.options.getString("faction");
