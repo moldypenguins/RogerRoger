@@ -58,7 +58,7 @@ export default {
       }
 
       const select = new StringSelectMenuBuilder()
-        .setCustomId("stockpiles_add_hex")
+        .setCustomId("stockpile_add_hex")
         .setPlaceholder("Select hex");
       select.options = _options;
 
@@ -92,7 +92,7 @@ export default {
           }
 
           const select = new StringSelectMenuBuilder()
-            .setCustomId("stockpiles_add_town")
+            .setCustomId("stockpile_add_town")
             .setPlaceholder("Select town");
           select.options = _options;
 
@@ -111,7 +111,7 @@ export default {
           }
 
           const select = new StringSelectMenuBuilder()
-            .setCustomId("stockpiles_add_building")
+            .setCustomId("stockpile_add_building")
             .setPlaceholder("Select building");
           select.options = _options;
 
@@ -127,12 +127,12 @@ export default {
           interaction.message.embeds[0].fields[2].value = `**Building:** ${_building}`;
 
           const save = new ButtonBuilder()
-            .setCustomId("stockpiles_add_save")
+            .setCustomId("stockpile_add_save")
             .setLabel("Save")
             .setStyle(ButtonStyle.Success);
     
           const cancel = new ButtonBuilder()
-            .setCustomId("stockpiles_add_cancel")
+            .setCustomId("stockpile_add_cancel")
             .setLabel("Cancel")
             .setStyle(ButtonStyle.Danger);
 
@@ -193,11 +193,11 @@ export default {
             }],
             components: [new ActionRowBuilder().addComponents(
               new ButtonBuilder()
-                .setCustomId(`stockpiles_refresh_${_stockpile._id}`)
+                .setCustomId(`stockpile_refresh_${_stockpile._id}`)
                 .setLabel("Refresh")
                 .setStyle(ButtonStyle.Success),
               new ButtonBuilder()
-                .setCustomId(`stockpiles_delete_${_stockpile._id}`)
+                .setCustomId(`stockpile_delete_${_stockpile._id}`)
                 .setLabel("Delete")
                 .setStyle(ButtonStyle.Danger))]
           }).then(async(message) => {
@@ -243,12 +243,12 @@ export default {
         let _sid = interaction.customId.split("_")[2];
 
         const yes = new ButtonBuilder()
-          .setCustomId(`stockpiles_confirm_yes_${_sid}`)
+          .setCustomId(`stockpile_confirm_yes_${_sid}`)
           .setLabel("Yes")
           .setStyle(ButtonStyle.Success);
     
         const no = new ButtonBuilder()
-          .setCustomId(`stockpiles_confirm_no_${_sid}`)
+          .setCustomId(`stockpile_confirm_no_${_sid}`)
           .setLabel("No")
           .setStyle(ButtonStyle.Danger);
 
