@@ -40,7 +40,7 @@ dayjs.extend(timezone);
 export default {
   data: new SlashCommandBuilder()
     .setName("rolereaction")
-    .setDescription("Add role reaction.")
+    .setDescription("Create a new role reaction message.")
     .setDMPermission(false)
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption(option => 

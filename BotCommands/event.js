@@ -40,19 +40,19 @@ dayjs.extend(timezone);
 export default {
   data: new SlashCommandBuilder()
     .setName("event")
-    .setDescription("Add an event.")
+    .setDescription("Create a new event.")
     .setDMPermission(false)
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption(option => 
       option
         .setName("title")
-        .setDescription("The role reaction title.")
+        .setDescription("The event title.")
         .setRequired(true)
         .setMaxLength(255))
     .addStringOption(option => 
       option
         .setName("description")
-        .setDescription("The role reaction description.")
+        .setDescription("The event description.")
         .setRequired(true)
         .setMaxLength(2000)),
    

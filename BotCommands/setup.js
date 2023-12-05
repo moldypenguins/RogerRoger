@@ -68,7 +68,7 @@ export default {
     .addSubcommand(subcommand =>
       subcommand
         .setName("welcome")
-        .setDescription("Set the welcome channel.")
+        .setDescription("Set the welcome channel and message.")
         .addChannelOption(option =>
           option
             .setName("channel")

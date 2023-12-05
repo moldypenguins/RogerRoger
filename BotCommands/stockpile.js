@@ -40,7 +40,7 @@ dayjs.extend(timezone);
 export default {
   data: new SlashCommandBuilder()
     .setName("stockpile")
-    .setDescription("Add a new stockpile.")
+    .setDescription("Create a new stockpile.")
     .setDMPermission(false)
     .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages),
   async execute(client, interaction) {
