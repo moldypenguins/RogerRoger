@@ -9,22 +9,22 @@ export default {
   name: Events.GuildMemberUpdate,
   once: false,
   async execute(client, oldMember, newMember) {
-    //console.log(`OLD: ${util.inspect(, true, 1, true)}`);
-    //console.log(`NEW: ${util.inspect(newMember.roles.cache, true, 1, true)}`);
-
     let _guild = await Guild.findOne({ guild_id: oldMember.guild.id });
-
+    let _action = "";
     let _reply = [];
     if(oldMember.nickname != newMember.nickname) {
+      _action = "Nickname Changed";
       _reply.push(`**${oldMember.nickname}** was changed to **${newMember.nickname}**`);
     }
     if(oldMember.roles.cache.size !== newMember.roles.cache.size) {
       if(oldMember.roles.cache.size < newMember.roles.cache.size) {
         //role added
+        _action = "Role Added";
         let _role = newMember.roles.cache.find(r => !oldMember.roles.cache.has(r.id));
         _reply.push(`**${_role.name}** was added to **${newMember.nickname}**`);
       } else {
         //role removed
+        _action = "Role Removed";
         let _role = oldMember.roles.cache.find(r => !newMember.roles.cache.has(r.id));
         _reply.push(`**${_role.name}** was removed from **${newMember.nickname}**`);
       }
@@ -36,7 +36,7 @@ export default {
         color: 0x77DD77,
         description: _reply.join("\n"),
         author: {
-          name: 'Guild Member Update',
+          name: `Guild Member Update (${_action})`,
           icon_url: 'https://i.imgur.com/SrvV95U.png'
         },
       }
