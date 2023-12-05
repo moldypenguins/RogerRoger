@@ -21,12 +21,12 @@ export default {
         //role added
         _action = "Role Added";
         let _role = newMember.roles.cache.find(r => !oldMember.roles.cache.has(r.id));
-        _reply.push(`**${_role.name}** was added to **${newMember.nickname}**`);
+        _reply.push(`${roleMention(_role.id)} was added to ${userMention(newMember.id)}`);
       } else {
         //role removed
         _action = "Role Removed";
         let _role = oldMember.roles.cache.find(r => !newMember.roles.cache.has(r.id));
-        _reply.push(`**${_role.name}** was removed from **${newMember.nickname}**`);
+        _reply.push(`${roleMention(_role.id)} was removed from ${userMention(newMember.id)}`);
       }
     }
 
