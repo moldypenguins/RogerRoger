@@ -14,7 +14,7 @@ export default {
     if(!member.user.bot) {
       client.channels.cache.get(_guild.guild_welcome).send({
         embeds: [{
-          color: _guild.guild_color,
+          color: _guild.guild_colour,
           description: `${_guild.guild_message.replace(/\\n/g, "\n").replace(/{{user}}/i, `${userMention(member.id)}`)}`,
         }], 
         ephemeral: false
