@@ -24,6 +24,7 @@
 
 
 import util from "util";
+import nodemon from 'nodemon';
 
 import Config from "./config.js";
 import { DB, Guild, Stockpile } from "./db.js";
@@ -58,6 +59,7 @@ if(argv.register) {
     } catch (err) {
       console.error(err);
     }
+    process.exit(0);
   })();
 }
 
@@ -229,4 +231,11 @@ DB.connection.once("open", async () => {
   console.log("Starting...");
   await client.login(Config.discord.token);
 
+
+
+});
+
+process.on('SIGINT', function() {
+  console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
+  process.exit(0);
 });
