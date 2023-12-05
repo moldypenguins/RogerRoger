@@ -42,7 +42,14 @@ export default {
     .setName("stockpile")
     .setDescription("Create a new stockpile.")
     .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages),
+    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+    .addStringOption(option => 
+      option
+        .setName("code")
+        .setDescription("The stockpile code.")
+        .setRequired(true)
+        .setMinLength(6)
+        .setMaxLength(6)),
   async execute(client, interaction) {
     //console.log(`INT: ${util.inspect(interaction, true, 2, true)}`);
     let _guild = await Guild.findOne({ guild_id: interaction.guildId });
