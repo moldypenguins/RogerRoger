@@ -31,7 +31,7 @@ export default {
   name: Events.GuildRoleCreate,
   once: false,
   async execute(client, role) {
-    console.log(`ROLE: ${util.inspect(role, true, 1, true)}`);
+    //console.log(`ROLE: ${util.inspect(role, true, 1, true)}`);
     let _guild = await Guild.findOne({ guild_id: role.guild.id });
 
     //admin logging

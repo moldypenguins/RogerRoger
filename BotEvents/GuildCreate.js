@@ -8,7 +8,7 @@ export default {
   name: Events.GuildCreate,
   once: false,
   async execute(client, guild) {
-    console.log(`Discord: Joined guild ${guild.name} (${guild.id})!`);
+    //console.log(`Discord: Joined guild ${guild.name} (${guild.id})!`);
 
     let _guild = await new Guild({
       _id: new DB.Types.ObjectId(),
