@@ -54,7 +54,15 @@ export default {
         .setName("description")
         .setDescription("The event description.")
         .setRequired(true)
-        .setMaxLength(2000)),
+        .setMaxLength(2000))
+    .addStringOption(option =>
+      option
+        .setName('color')
+        .setDescription('The color to set.')
+        .setRequired(false)
+        .setMinLength(6)
+        .setMaxLength(6)
+      ),
    
   async execute(client, interaction) {
     //console.log(`INT: ${util.inspect(interaction, true, 2, true)}`);
@@ -63,6 +71,8 @@ export default {
     if (interaction.isChatInputCommand()) {
       let _title = interaction.options.getString("title");
       let _description = interaction.options.getString("description");
+      let _color = interaction.options.getString("color");
+      if(_color) { _color = parseInt(_color, 16); } else { _color = _guild.guild_color; }
 
       const role = new RoleSelectMenuBuilder()
         .setCustomId("event_role")
@@ -82,7 +92,7 @@ export default {
 
       interaction.reply({ 
         embeds: [{
-          color: parseInt(_color, 16),
+          color: _color,
           title: _title,
           description: _description.replace(/\\n/g, "\n"),
           fields: []
