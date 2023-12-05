@@ -1,7 +1,7 @@
 "use strict";
 /**
- * Circuit
- * Copyright (c) 2023 Craig Roberts
+ * RogerRoger
+ * Copyright (c) 2023 The Old Republic - Craig Roberts
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,22 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see https://www.gnu.org/licenses/gpl-3.0.html
  *
- * @name BotCommands.js
- * @version 2023-11-28
- * @summary bot commands
+ * @name EventResponse.js
+ * @version 2023/11/28
+ * @summary Mongoose Model
  **/
 
 
-import event from "./event.js";
-import rolereaction from "./rolereaction.js";
-import setup from "./setup.js";
-import stockpiles from "./stockpiles.js";
+import mongoose from "mongoose";
 
-let BotCommands = {
-  event,
-  rolereaction,
-  setup,
-  stockpiles
-};
+let EventResponseSchema = new mongoose.Schema({
+  _id:            {type:mongoose.Schema.Types.ObjectId, required:true},
+  event_user:     {type:String, required:true},
+  event_response: {type:String, required:true}
+});
 
-export default BotCommands;
+export default mongoose.model("EventResponse", EventResponseSchema, "EventResponses");

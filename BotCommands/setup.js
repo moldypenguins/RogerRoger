@@ -68,18 +68,14 @@ export default {
     .addSubcommand(subcommand =>
       subcommand
         .setName("welcome")
-        .setDescription("Set the welcome channel.")
+        .setDescription("Set the welcome channel and message.")
         .addChannelOption(option =>
           option
             .setName("channel")
             .setDescription("The channel to post to.")
             .setRequired(true)
             .addChannelTypes(ChannelType.GuildText)
-          ))
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName("message")
-        .setDescription("Set the welcome message.")
+          )
         .addStringOption(option =>
           option.setName('message')
             .setDescription('The message to set.')
@@ -126,14 +122,14 @@ export default {
 
       } else if(_subcommand == "welcome") {
         let _channel = interaction.options.getChannel("channel").id;
-        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_welcome: _channel } });
-        interaction.reply({ content: `Set ${channelMention(_channel)} as the welcome channel.`, ephemeral: true });
-
-      } else if(_subcommand == "message") {
         let _message = interaction.options.getString("message");
         let _color = interaction.options.getString("color");
-        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_message: _message, guild_color: parseInt(_color, 16) } });
-        interaction.reply({ content: `Set guild welcome message.`, ephemeral: true });
+        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { 
+          guild_welcome: _channel,
+          guild_message: _message, 
+          guild_color: parseInt(_color, 16) 
+        } });
+        interaction.reply({ content: `Set the welcome channel and message.`, ephemeral: true });
 
       } else if(_subcommand == "faction") {
         let _faction = interaction.options.getString("faction");
