@@ -1,6 +1,6 @@
 "use strict";
 /**
- * stockpiles
+ * stockpile
  * Copyright (c) 2023 Craig Roberts
  *
  * This program is free software: you can redistribute it and/or modify
