@@ -137,11 +137,11 @@ DB.connection.once("open", async () => {
             }],
             components: [new ActionRowBuilder().addComponents(
               new ButtonBuilder()
-                .setCustomId(`stockpiles_refresh_${_stockpiles[_s]._id}`)
+                .setCustomId(`stockpile_refresh_${_stockpiles[_s]._id}`)
                 .setLabel("Refresh")
                 .setStyle(ButtonStyle.Success),
               new ButtonBuilder()
-                .setCustomId(`stockpiles_delete_${_stockpiles[_s]._id}`)
+                .setCustomId(`stockpile_delete_${_stockpiles[_s]._id}`)
                 .setLabel("Delete")
                 .setStyle(ButtonStyle.Danger))]
           }).then(async(message) => {
