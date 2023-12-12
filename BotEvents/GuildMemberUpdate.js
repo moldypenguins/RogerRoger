@@ -14,7 +14,6 @@ export default {
     let _reply = [];
     if(oldMember.nickname != newMember.nickname) {
       //name changed
-      _action = "";
       _reply.push(`Nickname: **${oldMember.nickname}** was changed to **${newMember.nickname}**`);
     }
     if(oldMember.roles.cache.size < newMember.roles.cache.size) {
