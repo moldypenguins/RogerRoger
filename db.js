@@ -23,26 +23,20 @@
 
 import Config from "./config.js";
 import mongoose from "mongoose";
-import Event from "./Models/Event.js";
 import Guild from "./Models/Guild.js";
 import Stockpile from "./Models/Stockpile.js";
 import Town from "./Models/Town.js";
 import User from "./Models/User.js";
 
 mongoose.set("strictQuery", true);
-mongoose.connect(`mongodb://${Config.db.url}`, {
-  //user: Config.db.user,
-  //pass: Config.db.pass,
-  dbName: Config.db.name
-}).catch((err) => console.log(err.reason));
+mongoose
+  .connect(`mongodb://${Config.db.url}`, {
+    //user: Config.db.user,
+    //pass: Config.db.pass,
+    dbName: Config.db.name,
+  })
+  .catch((err) => console.log(err.reason));
 mongoose.connection.on("error", (err) => console.log(err.reason));
 mongoose.connection.once("open", () => console.log("Database loaded."));
 
-export {
-  mongoose as DB,
-  Event,
-  Guild,
-  Stockpile,
-  Town,
-  User
-};
+export { mongoose as DB, Guild, Stockpile, Town, User };

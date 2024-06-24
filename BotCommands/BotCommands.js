@@ -21,17 +21,14 @@
  * @summary bot commands
  **/
 
-
-import event from "./event.js";
 import rolereaction from "./rolereaction.js";
 import setup from "./setup.js";
 import stockpile from "./stockpile.js";
 
 let BotCommands = {
-  event,
   rolereaction,
   setup,
-  stockpile
+  stockpile,
 };
 
 export default BotCommands;

@@ -24,7 +24,28 @@
 import util from "util";
 import Config from "../config.js";
 import { DB, Guild, Stockpile } from "../db.js";
-import { ActionRowBuilder, PermissionFlagsBits, ButtonStyle, ChannelType, time, EmbedBuilder, ChannelSelectMenuBuilder, RoleSelectMenuBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, roleMention, channelMention, userMention, ButtonBuilder, InteractionResponse, Integration } from "discord.js";
+import {
+  ActionRowBuilder,
+  PermissionFlagsBits,
+  ButtonStyle,
+  ChannelType,
+  time,
+  EmbedBuilder,
+  ChannelSelectMenuBuilder,
+  RoleSelectMenuBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  ModalBuilder,
+  SlashCommandBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  roleMention,
+  channelMention,
+  userMention,
+  ButtonBuilder,
+  InteractionResponse,
+  Integration,
+} from "discord.js";
 
 import { encode } from "html-entities";
 import numeral from "numeral";
@@ -36,77 +57,85 @@ dayjs.extend(advancedFormat);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-
 export default {
   data: new SlashCommandBuilder()
     .setName("setup")
     .setDescription("Configure bot.")
     .setDMPermission(false)
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addSubcommand(subcommand =>
+    .addSubcommand((subcommand) =>
       subcommand
         .setName("logs")
         .setDescription("Set the logs channel.")
-        .addChannelOption(option =>
+        .addChannelOption((option) =>
           option
             .setName("channel")
             .setDescription("The channel to post to.")
             .setRequired(true)
             .addChannelTypes(ChannelType.GuildText)
-          ))
-    .addSubcommand(subcommand =>
+        )
+    )
+    .addSubcommand((subcommand) =>
       subcommand
         .setName("stockpiles")
         .setDescription("Set the stockpiles channel.")
-        .addChannelOption(option =>
+        .addChannelOption((option) =>
           option
             .setName("channel")
             .setDescription("The channel to post to.")
             .setRequired(true)
             .addChannelTypes(ChannelType.GuildText)
-          ))
-    .addSubcommand(subcommand =>
+        )
+    )
+    .addSubcommand((subcommand) =>
       subcommand
         .setName("welcome")
         .setDescription("Set the welcome channel and message.")
-        .addChannelOption(option =>
+        .addChannelOption((option) =>
           option
             .setName("channel")
             .setDescription("The channel to post to.")
             .setRequired(true)
             .addChannelTypes(ChannelType.GuildText)
-          )
-        .addStringOption(option =>
-          option.setName('message')
-            .setDescription('The message to set.')
-            .setRequired(true)
-            .setMaxLength(2000) //ensure the text will fit in an embed description
-          ))
-    .addSubcommand(subcommand =>
+        )
+        .addStringOption(
+          (option) =>
+            option
+              .setName("message")
+              .setDescription("The message to set.")
+              .setRequired(true)
+              .setMaxLength(2000) //ensure the text will fit in an embed description
+        )
+    )
+    .addSubcommand((subcommand) =>
       subcommand
         .setName("color")
         .setDescription("Set the message color.")
-        .addStringOption(option =>
-          option.setName('color')
-            .setDescription('The color to set.')
+        .addStringOption((option) =>
+          option
+            .setName("color")
+            .setDescription("The color to set.")
             .setRequired(true)
             .setMinLength(6)
             .setMaxLength(6)
-          ))
-    .addSubcommand(subcommand =>
+        )
+    )
+    .addSubcommand((subcommand) =>
       subcommand
         .setName("faction")
         .setDescription("Set the guild faction.")
-        .addStringOption(option =>
-          option.setName('faction')
-            .setDescription('The faction to set.')
+        .addStringOption((option) =>
+          option
+            .setName("faction")
+            .setDescription("The faction to set.")
             .setRequired(true)
             .addChoices(
-              { name: 'Colonial', value: 'Colonial' },
-              { name: 'Warden', value: 'Warden' }
+              { name: "Colonial", value: "Colonial" },
+              { name: "Warden", value: "Warden" }
             )
-          )),
-   
+        )
+    ),
+
   async execute(client, interaction) {
     //console.log(`INT: ${util.inspect(interaction, true, 2, true)}`);
     let _guild = await Guild.findOne({ guild_id: interaction.guildId });
@@ -114,37 +143,55 @@ export default {
     if (interaction.isChatInputCommand()) {
       let _subcommand = interaction.options._subcommand;
 
-      if(_subcommand == "logs") {
+      if (_subcommand == "logs") {
         let _channel = interaction.options.getChannel("channel").id;
-        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_logs: _channel } });
-        interaction.reply({ content: `Set ${channelMention(_channel)} as the logs channel.`, ephemeral: true });
-
-      } else if(_subcommand == "stockpiles") {
+        await Guild.updateOne(
+          { guild_id: interaction.guildId },
+          { $set: { guild_logs: _channel } }
+        );
+        interaction.reply({
+          content: `Set ${channelMention(_channel)} as the logs channel.`,
+          ephemeral: true,
+        });
+      } else if (_subcommand == "stockpiles") {
         let _channel = interaction.options.getChannel("channel").id;
-        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_stockpiles: _channel } });
-        interaction.reply({ content: `Set ${channelMention(_channel)} as the stockpiles channel.`, ephemeral: true });
-
-      } else if(_subcommand == "welcome") {
+        await Guild.updateOne(
+          { guild_id: interaction.guildId },
+          { $set: { guild_stockpiles: _channel } }
+        );
+        interaction.reply({
+          content: `Set ${channelMention(_channel)} as the stockpiles channel.`,
+          ephemeral: true,
+        });
+      } else if (_subcommand == "welcome") {
         let _channel = interaction.options.getChannel("channel").id;
         let _message = interaction.options.getString("message");
-        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_welcome: _channel, guild_message: _message } });
-        interaction.reply({ content: `Set the welcome channel and message.`, ephemeral: true });
-
-      } else if(_subcommand == "color") {
+        await Guild.updateOne(
+          { guild_id: interaction.guildId },
+          { $set: { guild_welcome: _channel, guild_message: _message } }
+        );
+        interaction.reply({
+          content: `Set the welcome channel and message.`,
+          ephemeral: true,
+        });
+      } else if (_subcommand == "color") {
         let _color = interaction.options.getString("color");
-        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_color: parseInt(_color, 16) } });
-        interaction.reply({ content: `Set guild message color.`, ephemeral: true });
-
-      } else if(_subcommand == "faction") {
+        await Guild.updateOne(
+          { guild_id: interaction.guildId },
+          { $set: { guild_color: parseInt(_color, 16) } }
+        );
+        interaction.reply({
+          content: `Set guild message color.`,
+          ephemeral: true,
+        });
+      } else if (_subcommand == "faction") {
         let _faction = interaction.options.getString("faction");
-        await Guild.updateOne({ guild_id: interaction.guildId }, { $set: { guild_faction: _faction } });
+        await Guild.updateOne(
+          { guild_id: interaction.guildId },
+          { $set: { guild_faction: _faction } }
+        );
         interaction.reply({ content: `Set guild faction.`, ephemeral: true });
-
-      } 
-      
+      }
     }
-
-
-  }
+  },
 };
-

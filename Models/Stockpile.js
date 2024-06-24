@@ -21,18 +21,16 @@
  * @summary Mongoose Model
  **/
 
-
 import mongoose from "mongoose";
 
 let StockpileSchema = new mongoose.Schema({
-  _id:                {type:mongoose.Schema.Types.ObjectId, required:true},
-  stockpile_guild:    {type:String, required:true},
-  stockpile_hex:      {type:String, required:true},
-  stockpile_town:     {type:String, required:true},
-  stockpile_building: {type:String, required:true},
-  stockpile_code:     {type:String, required:true},
-  stockpile_post:     {type:String},
-  stockpile_refresh:  {type:Date, default: new Date()}
+  _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+  stockpile_guild: { type: String, required: true },
+  stockpile_location: { type: String, required: true },
+  stockpile_code: { type: String, required: true },
+  stockpile_post: { type: String },
+  stockpile_refresh: { type: Date, default: new Date() },
+  stockpile_refreshby: { type: String },
 });
 
 export default mongoose.model("Stockpile", StockpileSchema, "Stockpiles");
