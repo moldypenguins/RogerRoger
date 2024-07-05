@@ -111,7 +111,7 @@ export default {
         .setLabel("Cancel")
         .setStyle(ButtonStyle.Danger);
 
-      interaction.reply({
+      await interaction.reply({
         embeds: [
           {
             color: parseInt(_color, 16),
@@ -170,12 +170,25 @@ export default {
       } else if (_command == "react") {
         let _role = interaction.customId.split("_")[2];
         //console.log(`CID: ${util.inspect(interaction.member._roles, true, 0, true)}`);
+        let _added = null;
         if (interaction.member.roles.cache.has(_role)) {
           await interaction.member.roles.remove(_role);
+          _added = true;
         } else {
           await interaction.member.roles.add(_role);
+          _added = false;
         }
-        return interaction.deferUpdate();
+        await interaction.reply({
+          embeds: [
+            {
+              color: _guild.color,
+              title: roleMention(_role),
+              description: `role was ${_added ? "added" : "removed"}`,
+              fields: [],
+            },
+          ],
+          ephemeral: true,
+        });
       }
     } else if (interaction.isRoleSelectMenu()) {
       let _command = interaction.customId.split("_")[1];
@@ -215,8 +228,7 @@ export default {
 
         let _components = new ActionRowBuilder();
         for (let _id in interaction.message.embeds[0].fields) {
-          let _values =
-            interaction.message.embeds[0].fields[_id].value.split(": ");
+          let _values = interaction.message.embeds[0].fields[_id].value.split(": ");
 
           if (_values[1].includes("\n")) {
             let _vals = _values[1].split("\n");
@@ -226,9 +238,7 @@ export default {
 
           _components.addComponents(
             new ButtonBuilder()
-              .setCustomId(
-                `rolereaction_react_${_values[1].match(/^<@&(\d+)>$/)[1]}`
-              )
+              .setCustomId(`rolereaction_react_${_values[1].match(/^<@&(\d+)>$/)[1]}`)
               .setLabel(_values[0])
               .setStyle(ButtonStyle.Secondary)
           );
