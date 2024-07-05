@@ -182,8 +182,8 @@ export default {
           embeds: [
             {
               color: _guild.color,
-              title: roleMention(_role),
-              description: `role was ${_added ? "added" : "removed"}`,
+              title: `Role ${_added ? "Added" : "Removed"}`,
+              description: roleMention(_role),
               fields: [],
             },
           ],
