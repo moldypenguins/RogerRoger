@@ -173,10 +173,10 @@ export default {
         let _added = null;
         if (interaction.member.roles.cache.has(_role)) {
           await interaction.member.roles.remove(_role);
-          _added = true;
+          _added = false;
         } else {
           await interaction.member.roles.add(_role);
-          _added = false;
+          _added = true;
         }
         await interaction.reply({
           embeds: [
