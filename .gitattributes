@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Add Git-LFS to pbo files in the dist folder
+**/*.pbo filter=lfs diff=lfs merge=lfs -text

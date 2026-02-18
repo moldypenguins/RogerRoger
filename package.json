@@ -1,37 +1,68 @@
 {
   "name": "rogerroger",
   "description": "The Old Republic",
-  "keywords": [],
+  "keywords": [
+    "Discord"
+  ],
   "private": true,
   "license": "GPL-3.0",
   "version": "1.0.0-alpha",
   "repository": "github:moldypenguins/RogerRoger",
-  "funding": "https://www.buymeacoffee.com/moldypenguins",
-  "author": "Craig Roberts <craig.roberts@crdevel.com>",
+  "funding": "https://github.com/sponsors/moldypenguins",
+  "author": "moldypenguins <moldypenguins@crdevel.com>",
   "type": "module",
   "engines": {
-    "node": ">=18.12.1",
-    "npm": ">=9.5.0"
+    "node": ">=24.13.1",
+    "pnpm": ">=10.30.0"
   },
-  "exports": "./RogerRoger.js",
+  "packageManager": "pnpm@10.30.0",
+  "main": "./dist/index.js",
   "scripts": {
-    "test": "nodemon ./RogerRoger.js"
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "reg": "tsx src/index.ts -r",
+    "start": "nodemon dist/index.js",
+    "watch": "tsc --watch",
+    "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
-    "dayjs": "^1.11.10",
-    "discord.js": "^14.14.1",
-    "html-entities": "^2.4.0",
-    "isomorphic-unfetch": "^4.0.2",
-    "minimist": "^1.2.7",
-    "mongoose": "^8.0.1",
-    "mongoose-autopopulate": "^1.1.0",
+    "bree": "^9.2.8",
+    "dayjs": "^1.11.19",
+    "defu": "^6.1.4",
+    "discord.js": "^14.25.1",
+    "minimist": "^1.2.8",
+    "mongoose": "^9.1.6",
+    "mongoose-autopopulate": "1.2.1",
     "numeral": "^2.0.6",
-    "parse-duration": "^1.1.0",
-    "toad-scheduler": "^3.0.0"
+    "ofetch": "^1.5.1",
+    "parse-duration": "^2.1.5",
+    "pino": "^10.3.0",
+    "pino-princess": "1.5.2",
+    "ufo": "^1.6.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "eslint": "^8.54.0",
-    "eslint-plugin-jsdoc": "^46.5.1",
-    "nodemon": "^3.0.1"
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^25.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "debug": "^4.4.3",
+    "discord-api-types": "^0.38.38",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-format": "^1.0.2",
+    "eslint-plugin-jsdoc": "^62.5.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "nodemon": "^3.1.11",
+    "prettier": "^3.8.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "better-sqlite3",
+      "esbuild"
+    ]
   }
 }

@@ -1,0 +1,133 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "iulian-radu-at.vscode-tasks-sidebar",
+      "AlpineTeam.enscript-ide",
+      "esbenp.prettier-vscode",
+      "PrateekMahendrakar.prettyxml",
+      "mervin.markdown-formatter"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Localhost",
+        "detail": "Launches DayZServer_x64.exe with required arguments",
+        "type": "shell",
+        "command": "Z:\\dzDrive.ps1 -S 'P:\\IsleOfTheDead\\${workspaceFolderBasename}\\@${workspaceFolderBasename}'"
+      }
+    ]
+  },
+  "settings": {
+    "[markdown]": {
+      "editor.defaultFormatter": "mervin.markdown-formatter",
+      "editor.unicodeHighlight.ambiguousCharacters": false,
+      "editor.unicodeHighlight.invisibleCharacters": false,
+      "files.trimTrailingWhitespace": false,
+      "diffEditor.ignoreTrimWhitespace": false,
+      "editor.quickSuggestions": {
+        "comments": "off",
+        "strings": "off",
+        "other": "off"
+      }
+    },
+    "[xml]": {
+      "editor.defaultFormatter": "PrateekMahendrakar.prettyxml"
+    },
+    "[json][jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[enscript][rapfile]": {
+      "editor.formatOnSave": false
+    },
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "files.associations": {
+      "*.md": "markdown",
+      "*.xml": "xml",
+      "*.bbc.txt": "bbcode",
+      "*.c": "enscript",
+      "*.cpp": "rapfile",
+      "*.hpp": "rapfile"
+    },
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "off",
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": true,
+    "editor.indentSize": "tabSize",
+    "editor.tabSize": 2,
+    "editor.trimAutoWhitespace": true,
+    "editor.rulers": [120],
+    "prettyxml.settings.indentSpaceLength": 2,
+    "prettyxml.settings.positionAllAttributesOnFirstLine": true,
+    "prettyxml.settings.preserveWhiteSpacesInComment": true,
+    "vscodeTasksSidebar.defaultGrouped": true,
+    "enscript.diagnostics.enabled": true,
+    "enscript.logging.level": "debug",
+    "enscript.diagnostics.rules": {
+      "unused-typedef": {
+        "enabled": true,
+        "severity": "warning"
+      },
+      "undeclared-function": {
+        "enabled": true,
+        "severity": "error"
+      },
+      "undeclared-method": {
+        "enabled": true,
+        "severity": "error"
+      }
+    },
+    "enscript.modRoots": ["W:\\"],
+    "enscript.includePaths": ["P:\\Core", "P:\\DZ", "P:\\graphics", "P:\\gui", "P:\\languagecore", "P:\\scripts", "P:\\system"],
+    "enscript.formatting.astylePath": "astyle",
+    "enscript.formatting.arguments": [
+      "--suffix=none",
+      "--mode=c",
+      "--style=allman",
+      "--indent=spaces=2",
+      "--indent-modifiers",
+      "--indent-switches",
+      "--indent-labels",
+      "--indent-namespaces",
+      "--indent-after-parens",
+      "--indent-preproc-block",
+      "--indent-preproc-define",
+      "--indent-col1-comments",
+      "--pad-oper",
+      "--pad-comma",
+      "--pad-include=none",
+      "--pad-header",
+      "--unpad-paren",
+      "--unpad-brackets",
+      "--delete-empty-lines",
+      "--squeeze-lines=2",
+      "--align-pointer=type",
+      "--align-reference=name",
+      "--add-braces",
+      "--add-one-line-braces",
+      "--attach-return-type",
+      "--attach-return-type-decl",
+      "--keep-one-line-statements",
+      "--keep-one-line-blocks",
+      "--close-templates",
+      "--convert-tabs",
+      "--max-code-length=160",
+      "--lineend=linux"
+    ],
+    "enscript.diagnostics.enableExternalPinnedTabDiagnostics": false,
+    "enscript.diagnostics.enableExternalTabDiagnostics": false,
+    "enscript.diagnostics.enableTiming": true
+  }
+}

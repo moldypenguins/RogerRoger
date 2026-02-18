@@ -1,46 +1,77 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/images/roger_roger.png">
-  <source media="(prefers-color-scheme: light)" srcset=".github/images/roger_roger.png">
-  <img alt="logo" src=".github/images/roger_roger.png">
-</picture>
-<h1>RogerRoger</h1>
-<h3>The Old Republic</h3>
+<p align="center">
+<a href="https://github.com/moldypenguins/RogerRoger">
+<img alt="RogerRoger" src=".github/images/RogerRoger.png" width="150"></center>
+</a>
+</p>
+
+<h1 align="center">RogerRoger</h1></center>
+<p align="center"><i>Surrender Jedi dogs!</i></p>
 
 ***  
-![License](https://img.shields.io/github/license/moldypenguins/FiremanSam?logo=GNU&style=for-the-badge&color=BD0000)
-![Package Version](https://img.shields.io/github/package-json/v/moldypenguins/FiremanSam?logo=GitHub&style=for-the-badge&color=007EC6)
-![Last Commit](https://img.shields.io/github/last-commit/moldypenguins/FiremanSam?style=for-the-badge&logo=GitHub)  
-![Open Issues](https://img.shields.io/github/issues-raw/moldypenguins/FiremanSam?style=for-the-badge&logo=GitHub)
-![Open Pull Requests](https://img.shields.io/github/issues-pr-raw/moldypenguins/FiremanSam?style=for-the-badge&logo=GitHub)
-![Snyk Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/github/moldypenguins/FiremanSam?style=for-the-badge&logo=Snyk)  
-![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/moldypenguins/FiremanSam?style=for-the-badge&label=Code%20Grade&logo=CodeFactor)
-![CodeQL](https://img.shields.io/github/actions/workflow/status/moldypenguins/FiremanSam/codeql.yml?label=CodeQL&logo=github&style=for-the-badge)
-![ESLint](https://img.shields.io/github/actions/workflow/status/moldypenguins/FiremanSam/eslint.yml?label=ESLint&logo=eslint&style=for-the-badge)
-![Dependabot](https://img.shields.io/static/v1?style=for-the-badge&label=Dependabot&message=enabled&color=33CC11&logo=Dependabot)
+[![License](https://img.shields.io/github/license/moldypenguins/RogerRoger?logo=GNU&style=for-the-badge&color=BD0000)][github-href]
+[![Package Version](https://img.shields.io/github/package-json/v/moldypenguins/RogerRoger?logo=GitHub&style=for-the-badge&color=007EC6)][github-href]  
+[![Last Commit](https://img.shields.io/github/last-commit/moldypenguins/RogerRoger?style=for-the-badge&logo=GitHub)][github-href]
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/moldypenguins/RogerRoger/codeql.yml?style=for-the-badge&label=CodeQL&logo=githubactions&logoColor=FFFFFF)][github-href]  
+[![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=FFFFFF)][github-href]
+[![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=FFFFFF)][github-href]
+[![Dependabot](https://img.shields.io/badge/dependabot-025E8C?style=for-the-badge&logo=dependabot&logoColor=FFFFFF)][github-href]  
 ***  
 
-## Table of Contents
-* [Environment](#environment)
-* [Change Log](#change-log)
-* [Setup / Installation](#setup-/-installation)
-* [Issues / Support](#issues-/-support)
-* [Roadmap](#roadmap)
-* [Contributing](#contributing)
-* [Code of Conduct](#code-of-conduct)
-* [Related Projects](#related-projects)
-* [Author](#author)
-* [Contributors](#contributors)
-* [Licenses](#licenses)
+### Quick Start
 
+1. **Install pnpm:**
 
-## Author
-_**Craig Roberts**_  
-[![GitHub](https://img.shields.io/badge/moldypenguins-6e5494?labelColor=555555&logo=github&style=for-the-badge)](https://github.com/moldypenguins)
-[![Discord](https://img.shields.io/badge/@moldypenguins-5865F2?labelColor=555555&logo=discord&style=for-the-badge)](https://discordapp.com/users/346771877211144194)
-[![Telegram](https://img.shields.io/badge/@moldypenguins-27A7E7?labelColor=555555&logo=telegram&style=for-the-badge)](https://t.me/moldypenguins)  
+```bash
+  npm install -g pnpm
+```
 
+2. **Install dependencies:**
+
+```bash
+  pnpm install
+```
+
+3. **Configure the bot:**
+
+```bash
+  cp src/config.example.ts src/config.ts
+  # Edit src/config.ts with your settings
+```
+
+4. **Build the bot:**
+
+```bash
+  pnpm build
+```
+
+5. **Register Discord commands:**
+
+```bash
+  pnpm reg
+```
+
+6. **Start the bot:**
+
+```bash
+  pnpm start
+```
+
+### Development
+
+For development with auto-reload:
+
+```bash
+  pnpm dev
+```
+
+## Contact
+
+<img src="https://raw.githubusercontent.com/ExileDeadZone/.github/main/images/discord.png" width="250" />
 
 ## Licenses
-Copyright © 2023 Fireman Sam  
-Licensed under the GNU General Public License Version 3  
-See [LICENSE.md](LICENSE.md) or [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html) for more details
+
+Copyright © 2026 Isle of The Dead. Licensed under the GNU General Public License Version 3.  
+See [license.md](license.md) or [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html) for more details.
+
+<!-- LINKS -->
+[github-href]: https://github.com/moldypenguins/RogerRoger
