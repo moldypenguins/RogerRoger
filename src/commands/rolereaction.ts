@@ -4,10 +4,10 @@
  * @summary Role reaction commands
  **/
 
-import type { GuildMemberRoleManager, Interaction, LabelBuilder } from "discord.js"
-import type { DiscordBot } from "../types"
-
 import {
+  GuildMemberRoleManager,
+  Interaction,
+  LabelBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -25,8 +25,8 @@ import {
   MessageFlags
 } from "discord.js"
 
-import type { DiscordCommand, DiscordGuildData } from "../types"
-import { DiscordGuild } from "../databank"
+import type { DiscordBot, DiscordCommand, DiscordGuildData } from "../types/index.js"
+import { DiscordGuild } from "../databank/index.js"
 
 const commandRoleReaction: DiscordCommand = {
   data: new SlashCommandBuilder()

@@ -3,13 +3,12 @@
  * @version 2026-02-05
  * @summary GuildCreate event hadler
  **/
-"use strict"
 
 //import util from "node:util"
 import { Events, Guild } from "discord.js"
-import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types"
-import Config from "../config"
-import { DiscordGuild } from "../databank"
+import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
+import Config from "../config/index.js"
+import { DiscordGuild } from "../databank/index.js"
 
 const ev: DiscordEvent = {
   name: Events.GuildCreate,

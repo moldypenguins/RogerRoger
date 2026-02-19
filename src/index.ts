@@ -7,8 +7,8 @@
 "use strict"
 
 // local imports
-import { Databank } from "./databank"
-import { DiscordBot } from "./bot"
+import { Databank } from "./databank/index.js"
+import { DiscordBot } from "./bot.js"
 
 import minimist from "minimist"
 let argv = minimist(process.argv.slice(2), {

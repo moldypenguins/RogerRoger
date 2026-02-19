@@ -4,12 +4,13 @@
  * @summary Database
  **/
 
-import Config from "../config"
 import mongoose from "mongoose"
-import DiscordGuild from "./DiscordGuild"
-import DiscordUser from "./DiscordUser"
-import FoxholeStockpile from "./FoxholeStockpile"
-import FoxholeTown from "./FoxholeTown"
+import DiscordGuild from "./DiscordGuild.js"
+import DiscordUser from "./DiscordUser.js"
+import FoxholeStockpile from "./FoxholeStockpile.js"
+import FoxholeTown from "./FoxholeTown.js"
+
+import Config from "../config/index.js"
 
 mongoose.set("strictQuery", true)
 mongoose.connect(Config.database).catch((err) => console.log(err.reason))

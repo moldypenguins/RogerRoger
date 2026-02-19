@@ -4,7 +4,7 @@
  * @summary Example local configuration - Copy this to config.ts and fill in your values
  **/
 
-import type { Config } from "../types"
+import { Config } from "../types/index.js"
 
 const localConfig: Config = {
   debug: false,

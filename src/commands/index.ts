@@ -5,10 +5,10 @@
  **/
 "use strict"
 
-import type { DiscordCommand } from "../types"
-import rolereaction from "./rolereaction"
-import setup from "./setup"
-import stockpile from "./stockpile"
+import type { DiscordCommand } from "../types/index.js"
+import rolereaction from "./rolereaction.js"
+import setup from "./setup.js"
+import stockpile from "./stockpile.js"
 
 /**
  * Strongly typed collection of Discord command handlers

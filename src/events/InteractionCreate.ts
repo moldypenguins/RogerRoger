@@ -9,11 +9,11 @@ import util from "node:util"
 
 import type { Interaction } from "discord.js"
 import { Events } from "discord.js"
-import type { DiscordBot, DiscordEvent } from "../types"
-import Config from "../config"
-// import { Databank } from "../databank"
+import type { DiscordBot, DiscordEvent } from "../types/index.js"
+import Config from "../config/index.js"
+// import { Databank } from "../databank/index.js"
 
-import DiscordCommands from "../commands"
+import DiscordCommands from "../commands/index.js"
 
 /**
  * Message create event handler

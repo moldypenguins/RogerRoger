@@ -1,5 +1,5 @@
 /**
- * @name DiscordBot.ts
+ * @name bot.ts
  * @version 2026-02-18
  * @summary Extended Discord client with custom bot functionality
  **/
@@ -8,9 +8,9 @@
 import { APIApplicationCommand, Client, GatewayIntentBits, REST, Routes } from "discord.js"
 
 // local imports
-import Config from "./config"
-import DiscordEvents from "./events"
-import DiscordCommands from "./commands"
+import Config from "./config/index.js"
+import DiscordEvents from "./events/index.js"
+import DiscordCommands from "./commands/index.js"
 
 /** Extended discord.js Client with command and event handling */
 export class DiscordBot extends Client {

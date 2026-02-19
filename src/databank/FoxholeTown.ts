@@ -6,7 +6,7 @@
 "use strict"
 
 import { model, Schema } from "mongoose"
-import { FoxholeTownData } from "../types"
+import { FoxholeTownData } from "../types/index.js"
 
 let FoxholeTownSchema = new Schema<FoxholeTownData>(
   {

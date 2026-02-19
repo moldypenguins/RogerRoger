@@ -5,7 +5,7 @@
  **/
 
 import defu from "defu"
-import localConfig from "./local"
+import localConfig from "../config/local.js"
 
 export default defu(localConfig, {
   debug: false,

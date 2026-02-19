@@ -7,9 +7,9 @@
 import util from "node:util"
 
 import { Events, VoiceState, channelMention } from "discord.js"
-import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types"
-import Config from "../config"
-import { DiscordGuild } from "../databank"
+import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
+import Config from "../config/index.js"
+import { DiscordGuild } from "../databank/index.js"
 
 /** Voice state update event handler */
 const ev: DiscordEvent = {

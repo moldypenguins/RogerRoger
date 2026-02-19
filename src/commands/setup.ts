@@ -4,8 +4,8 @@
  * @summary Setup Commands
  **/
 
-import type { Client, Interaction } from "discord.js"
 import {
+  Interaction,
   ChannelType,
   InteractionContextType,
   PermissionFlagsBits,
@@ -14,8 +14,8 @@ import {
   channelMention
 } from "discord.js"
 
-import type { DiscordCommand } from "../types"
-import { DiscordGuild } from "../databank"
+import type { DiscordBot, DiscordCommand } from "../types/index.js"
+import { DiscordGuild } from "../databank/index.js"
 
 const commandSetup: DiscordCommand = {
   data: new SlashCommandBuilder()
@@ -66,7 +66,7 @@ const commandSetup: DiscordCommand = {
         )
     ),
 
-  async execute(client: Client, interaction: Interaction): Promise<void> {
+  async execute(client: DiscordBot, interaction: Interaction): Promise<void> {
     if (!interaction.isChatInputCommand()) return
 
     const _subcommand = interaction.options.getSubcommand()

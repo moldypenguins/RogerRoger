@@ -6,9 +6,9 @@
 "use strict"
 
 import { Events, GuildMember, roleMention } from "discord.js"
-import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types"
-import Config from "../config"
-import { DiscordGuild } from "../databank"
+import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
+import Config from "../config/index.js"
+import { DiscordGuild } from "../databank/index.js"
 
 /** Guild member update event handler */
 const ev: DiscordEvent = {

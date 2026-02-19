@@ -5,15 +5,15 @@
  **/
 "use strict"
 
-import type { DiscordEvent } from "../types"
-import ClientReady from "./ClientReady"
-import GuildCreate from "./GuildCreate"
-import GuildMemberAdd from "./GuildMemberAdd"
-import GuildMemberRemove from "./GuildMemberRemove"
-import GuildMemberUpdate from "./GuildMemberUpdate"
-import InteractionCreate from "./InteractionCreate"
-import MessageCreate from "./MessageCreate"
-import VoiceStateUpdate from "./VoiceStateUpdate"
+import type { DiscordEvent } from "../types/index.js"
+import ClientReady from "./ClientReady.js"
+import GuildCreate from "./GuildCreate.js"
+import GuildMemberAdd from "./GuildMemberAdd.js"
+import GuildMemberRemove from "./GuildMemberRemove.js"
+import GuildMemberUpdate from "./GuildMemberUpdate.js"
+import InteractionCreate from "./InteractionCreate.js"
+import MessageCreate from "./MessageCreate.js"
+import VoiceStateUpdate from "./VoiceStateUpdate.js"
 
 /**
  * Strongly typed collection of Discord event handlers

@@ -1,11 +1,18 @@
 /**
  * @name types/index.d.ts
- * @version 2026-01-13
+ * @version 2026-02-18
  * @summary Type definitions
  **/
 
-import type { Guild, User, Interaction, Events } from "discord.js"
-import type { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder, Client } from "discord.js"
+import type {
+  Client,
+  Guild,
+  User,
+  Interaction,
+  Events,
+  SlashCommandBuilder,
+  SlashCommandSubcommandsOnlyBuilder
+} from "discord.js"
 import type { Schema } from "mongoose"
 
 /** Interfaces for databank models */

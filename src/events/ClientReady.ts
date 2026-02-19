@@ -3,13 +3,11 @@
  * @version 2026-02-04
  * @summary Handles the client ready event
  **/
-"use strict"
 
-import type { Guild, GuildMember } from "discord.js"
-import { ActivityType, Events } from "discord.js"
-import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types"
-import Config from "../config"
-import { DiscordGuild, DiscordUser } from "../databank"
+import { Guild, GuildMember, ActivityType, Events } from "discord.js"
+import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
+import Config from "../config/index.js"
+import { DiscordGuild, DiscordUser } from "../databank/index.js"
 
 /**
  * Ready event handler - fires once when the bot is ready

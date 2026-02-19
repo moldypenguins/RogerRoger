@@ -6,13 +6,12 @@
 "use strict"
 
 import { model, Schema } from "mongoose"
-
-import { FoxholeStockpileData } from "../types"
-
 import mongooseAutoPopulate from "mongoose-autopopulate"
-import DiscordGuild from "./DiscordGuild"
-import DiscordUser from "./DiscordUser"
-import FoxholeTown from "./FoxholeTown"
+import DiscordGuild from "./DiscordGuild.js"
+import DiscordUser from "./DiscordUser.js"
+import FoxholeTown from "./FoxholeTown.js"
+
+import { FoxholeStockpileData } from "../types/index.js"
 
 let FoxholeStockpileSchema = new Schema<FoxholeStockpileData>(
   {

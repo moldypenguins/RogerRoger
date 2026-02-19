@@ -6,7 +6,7 @@
 "use strict"
 
 import { model, Schema } from "mongoose"
-import { DiscordUserData } from "../types"
+import { DiscordUserData } from "../types/index.js"
 
 /** Mongoose schema for Discord user data */
 const DiscordUserSchema = new Schema<DiscordUserData>(
