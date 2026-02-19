@@ -42,8 +42,8 @@ importers:
         specifier: ^10.3.1
         version: 10.3.1
       pino-princess:
-        specifier: 1.5.2
-        version: 1.5.2(typescript@5.9.3)
+        specifier: 1.6.1
+        version: 1.6.1(typescript@5.9.3)
       ufo:
         specifier: ^1.6.3
         version: 1.6.3
@@ -1195,8 +1195,8 @@ packages:
   pino-abstract-transport@3.0.0:
     resolution: {integrity: sha512-wlfUczU+n7Hy/Ha5j9a/gZNy7We5+cXp8YL+X+PG8S0KXxw7n/JXA3c46Y0zQznIJ83URJiwy7Lh56WLokNuxg==}
 
-  pino-princess@1.5.2:
-    resolution: {integrity: sha512-5iBDQRv3phC0vps3Jj5CMwpSZbh61gpd/QiYhuYtcgxLfvk4cGiR0GhCED7atIpFBqp6NL38TUK7EkMoaUmhGw==}
+  pino-princess@1.6.1:
+    resolution: {integrity: sha512-MMfQDdFmzR4eE3V7HNhu7EZ/TIT40iRmaBU8dqM4fA0HGEmfO/QzpdpyZxIbcpnqhdCOfj50fr80FqT1rWPVWA==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -2552,7 +2552,7 @@ snapshots:
     dependencies:
       split2: 4.2.0
 
-  pino-princess@1.5.2(typescript@5.9.3):
+  pino-princess@1.6.1(typescript@5.9.3):
     dependencies:
       chalk: 5.6.2
       cli-highlight: 2.1.11
