@@ -29,20 +29,24 @@ const ev: DiscordEvent = {
     // Admin logging
     const _logchan = client.channels.cache.get(_guild.logsChannelId)
     if (_logchan?.isTextBased() && "send" in _logchan) {
-      const channelType =
-        channel.type === ChannelType.GuildText
-          ? "Text"
-          : channel.type === ChannelType.GuildVoice
-            ? "Voice"
-            : channel.type === ChannelType.GuildCategory
-              ? "Category"
-              : "Unknown"
+      let channelType = "Unknown"
+      switch (channel.type) {
+        case ChannelType.GuildText:
+          channelType = "Text"
+          break
+        case ChannelType.GuildVoice:
+          channelType = "Voice"
+          break
+        case ChannelType.GuildCategory:
+          channelType = "Category"
+          break
+      }
 
       _logchan.send({
         embeds: [
           {
             color: 0x77dd77,
-            description: `**Channel created**\n**Name:** ${channel.name}\n**Type:** ${channelType}\n**Channel:** <#${channel.id}>`,
+            description: `**Channel created**\n**Type:** ${channelType}\n**Channel:** <#${channel.id}>`,
             author: {
               name: "Channel Create",
               icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
