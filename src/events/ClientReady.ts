@@ -6,8 +6,8 @@
 "use strict"
 
 import type { Guild, GuildMember } from "discord.js"
-import { ActivityType, Client, Events } from "discord.js"
-import type { DiscordEvent, DiscordGuildData } from "../types"
+import { ActivityType, Events } from "discord.js"
+import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types"
 import Config from "../config"
 import { DiscordGuild, DiscordUser } from "../databank"
 
@@ -17,7 +17,7 @@ import { DiscordGuild, DiscordUser } from "../databank"
 const ev: DiscordEvent = {
   name: Events.ClientReady,
   once: true,
-  execute: async (client: Client) => {
+  execute: async (client: DiscordBot) => {
     if (!client.user) return
 
     console.log(`Logged in as ${client.user.displayName}!`)

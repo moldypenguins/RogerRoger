@@ -4,7 +4,9 @@
  * @summary Role reaction commands
  **/
 
-import type { Client, Interaction } from "discord.js"
+import type { GuildMemberRoleManager, Interaction, LabelBuilder } from "discord.js"
+import type { DiscordBot } from "../types"
+
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -19,7 +21,8 @@ import {
   SlashCommandBuilder,
   TextInputBuilder,
   TextInputStyle,
-  roleMention
+  roleMention,
+  MessageFlags
 } from "discord.js"
 
 import type { DiscordCommand, DiscordGuildData } from "../types"
@@ -51,15 +54,21 @@ const commandRoleReaction: DiscordCommand = {
         .setMaxLength(6)
     ),
 
-  async execute(client, interaction) {
+  async execute(client: DiscordBot, interaction: Interaction): Promise<void> {
     //console.log(`INT: ${util.inspect(interaction, true, 2, true)}`);
     let _guild: DiscordGuildData | null = await DiscordGuild.findOne({ id: interaction.guildId })
     if (!_guild) return
+
+    if (!interaction.channel) return
+    const _channel = client.channels.cache.get(interaction.channel.id)
+    if (!_channel || !_channel.isTextBased()) return
 
     if (interaction.isChatInputCommand()) {
       let _title = interaction.options.getString("title")
       let _description = interaction.options.getString("description")
       let _color = interaction.options.getString("color")
+
+      if (!_title || !_description || !_color) return
 
       const role = new RoleSelectMenuBuilder()
         .setCustomId("rolereaction_role")
@@ -83,66 +92,63 @@ const commandRoleReaction: DiscordCommand = {
             fields: []
           }
         ],
-        components: [new ActionRowBuilder().addComponents(role), new ActionRowBuilder().addComponents(post, cancel)],
-        ephemeral: false
+        components: [
+          new ActionRowBuilder<RoleSelectMenuBuilder>({ components: [role] }),
+          new ActionRowBuilder<ButtonBuilder>({ components: [post, cancel] })
+        ],
+        ephemeral: false,
+        flags: MessageFlags.IsComponentsV2
       })
     } else if (interaction.isButton()) {
       let _command = interaction.customId.split("_")[1]
-
       if (_command == "post") {
-        try {
-          await client.channels.cache
-            .get(interaction.channel.id)
-            .messages.fetch(interaction.message.id)
-            .then((message: Message) => {
-              let _channel = new ChannelSelectMenuBuilder()
-                .setCustomId("rolereaction_channel")
-                .setPlaceholder("Channel")
-                .setMinValues(1)
-                .setMaxValues(1)
-
-              let _cancel = new ButtonBuilder()
-                .setCustomId("rolereaction_cancel")
-                .setLabel("Cancel")
-                .setStyle(ButtonStyle.Danger)
-
-              message.edit({
-                components: [
-                  new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(_channel),
-                  new ActionRowBuilder<ButtonBuilder>().addComponents(_cancel)
-                ]
-              })
-
-              return interaction.deferUpdate()
+        await _channel.messages
+          .fetch(interaction.message.id)
+          .then((message: Message) => {
+            let _channel = new ChannelSelectMenuBuilder()
+              .setCustomId("rolereaction_channel")
+              .setPlaceholder("Channel")
+              .setMinValues(1)
+              .setMaxValues(1)
+            let _cancel = new ButtonBuilder()
+              .setCustomId("rolereaction_cancel")
+              .setLabel("Cancel")
+              .setStyle(ButtonStyle.Danger)
+            message.edit({
+              components: [
+                new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(_channel),
+                new ActionRowBuilder<ButtonBuilder>().addComponents(_cancel)
+              ]
             })
-        } catch (err) {
-          console.log(`Error: ${err}`)
-        }
+            interaction.deferUpdate()
+          })
+          .catch((err) => {
+            console.log(`Error: ${err}`)
+          })
       } else if (_command == "cancel") {
-        try {
-          await client.channels.cache
-            .get(interaction.message.channelId)
-            .messages.fetch(interaction.message.id)
-            .then((message: Message) => message.delete())
-        } catch (err) {
-          console.log(`Error: ${err}`)
-        }
+        await _channel.messages
+          .fetch(interaction.message.id)
+          .then((message: Message) => message.delete())
+          .catch((err) => {
+            console.log(`Error: ${err}`)
+          })
       } else if (_command == "react") {
+        if (!interaction.member) return
+
         let _role = interaction.customId.split("_")[2]
-        //console.log(`CID: ${util.inspect(interaction.member._roles, true, 0, true)}`);
-        let _added = null
-        if (interaction.member.roles.cache.has(_role)) {
-          await interaction.member.roles.remove(_role)
-          _added = false
+
+        const _roles = interaction.member.roles as GuildMemberRoleManager
+
+        if (_roles.cache.has(_role)) {
+          await _roles.remove(_role)
         } else {
-          await interaction.member.roles.add(_role)
-          _added = true
+          await _roles.add(_role)
         }
         await interaction.reply({
           embeds: [
             {
               color: _guild.embedColor,
-              title: `Role ${_added ? "Added" : "Removed"}`,
+              title: `Role ${_roles.cache.has(_role) ? "Added" : "Removed"}`,
               description: roleMention(_role),
               fields: []
             }
@@ -182,9 +188,10 @@ const commandRoleReaction: DiscordCommand = {
       let _command = interaction.customId.split("_")[1]
 
       if (_command == "channel") {
-        let _channel = interaction.values[0]
+        const _postchan = client.channels.cache.get(interaction.values[0])
+        if (!_postchan || !_postchan.isTextBased() || !_postchan.isSendable()) return
 
-        let _components = new ActionRowBuilder()
+        let _components = new ActionRowBuilder<ButtonBuilder>()
         for (let _id in interaction.message.embeds[0].fields) {
           let _values = interaction.message.embeds[0].fields[_id].value.split(": ")
 
@@ -194,9 +201,12 @@ const commandRoleReaction: DiscordCommand = {
             _values[2] = _vals[1]
           }
 
+          const _text = _values[1].match(/^<@&(\d+)>$/)
+          if (!_text) return
+
           _components.addComponents(
             new ButtonBuilder()
-              .setCustomId(`rolereaction_react_${_values[1].match(/^<@&(\d+)>$/)[1]}`)
+              .setCustomId(`rolereaction_react_${_text[1]}`)
               .setEmoji(_values[0])
               .setStyle(ButtonStyle.Secondary)
           )
@@ -213,28 +223,26 @@ const commandRoleReaction: DiscordCommand = {
           inline: false
         })
 
-        client.channels.cache.get(_channel).send({
+        _postchan.send({
           embeds: [
             {
-              color: interaction.message.embeds[0].color,
-              title: interaction.message.embeds[0].title,
-              description: interaction.message.embeds[0].description,
+              color: interaction.message.embeds[0].color ?? undefined,
+              title: interaction.message.embeds[0].title ?? undefined,
+              description: interaction.message.embeds[0].description ?? undefined,
               fields: interaction.message.embeds[0].fields
             }
           ],
           components: [_components]
         })
 
-        try {
-          await client.channels.cache
-            .get(interaction.message.channelId)
-            .messages.fetch(interaction.message.id)
-            .then((message: Message) => message.delete())
-        } catch (err) {
-          console.log(`Error: ${err}`)
-        }
+        await _channel.messages
+          .fetch(interaction.message.id)
+          .then((message: Message) => message.delete())
+          .catch((err) => {
+            console.log(`Error: ${err}`)
+          })
 
-        return interaction.deferUpdate()
+        interaction.deferUpdate()
       }
     } else if (interaction.isModalSubmit()) {
       let _command = interaction.customId.split("_")[1]
@@ -246,26 +254,24 @@ const commandRoleReaction: DiscordCommand = {
         let _description = interaction.fields.getTextInputValue("description")
 
         try {
-          await client.channels.cache
-            .get(interaction.channel.id)
-            .messages.fetch(_message)
-            .then((message: Message) => {
-              let _embed = EmbedBuilder.from(message.embeds[0]).data
-              if (!_embed.fields) {
-                _embed.fields = []
-              }
-              _embed.fields.push({
-                name: "",
-                value: `${_emoji}: ${roleMention(_role)}` + (_description ? `\n${_description}` : "") + "\n",
-                inline: false
-              })
-
-              message.edit({
-                embeds: [_embed]
-              })
-
-              return interaction.deferUpdate()
+          await _channel.messages.fetch(_message).then((message: Message) => {
+            let _embed = EmbedBuilder.from(message.embeds[0]).data
+            if (!_embed.fields) {
+              _embed.fields = []
+            }
+            _embed.fields.push({
+              name: "",
+              value: `${_emoji}: ${roleMention(_role)}` + (_description ? `\n${_description}` : "") + "\n",
+              inline: false
             })
+
+            message.edit({
+              embeds: [_embed]
+            })
+
+            interaction.deferUpdate()
+            return
+          })
         } catch (err) {
           console.log(`Error: ${err}`)
         }

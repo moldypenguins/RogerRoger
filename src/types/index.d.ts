@@ -4,7 +4,9 @@
  * @summary Type definitions
  **/
 
-import type { Guild, User } from "discord.js"
+import type { Guild, User, Interaction, Events } from "discord.js"
+import type { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder, Client } from "discord.js"
+import type { Schema } from "mongoose"
 
 /** Interfaces for databank models */
 export interface DiscordGuildData extends Guild {
@@ -25,6 +27,28 @@ export interface DiscordUserData extends User {
   updatedAt: Date
 }
 
+/** Extended Discord Client with custom bot functionality */
+export class DiscordBot extends Client {
+  public constructor()
+
+  public register(): Promise<void>
+  public start(): Promise<void>
+  public shutdown(): Promise<void>
+}
+
+/** Interface for Discord command handlers */
+export interface DiscordCommand {
+  data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder
+  execute: (client: DiscordBot, interaction: Interaction) => void | Promise<void>
+}
+
+/** Interface for Discord event handlers */
+export interface DiscordEvent {
+  name: Events
+  once?: boolean
+  execute: (client: DiscordBot, ...args) => void | Promise<void>
+}
+
 export interface FoxholeTownData {
   _id: Schema.Types.ObjectId
   hex: string
@@ -43,19 +67,6 @@ export interface FoxholeStockpileData {
   updatedBy: Schema.Types.ObjectId
   createdAt: Date
   updatedAt: Date
-}
-
-/** Interface for Discord command handlers */
-export interface DiscordCommand {
-  data: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder
-  execute: (client: Client, ...args) => void | Promise<void>
-}
-
-/** Interface for Discord event handlers */
-export interface DiscordEvent {
-  name: string
-  once?: boolean
-  execute: (client: Client, ...args) => void | Promise<void>
 }
 
 /** Interface for configuration */
