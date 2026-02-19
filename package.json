@@ -18,11 +18,11 @@
   "packageManager": "pnpm@10.30.0",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "dev": "tsx src/index.ts",
     "reg": "tsx src/index.ts -r",
     "start": "nodemon dist/index.js",
-    "watch": "tsc --watch",
+    "watch": "tsc --watch & tsc-alias --watch",
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
@@ -55,6 +55,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "nodemon": "^3.1.11",
     "prettier": "^3.8.1",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
