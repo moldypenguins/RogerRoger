@@ -31,7 +31,7 @@
     "defu": "^6.1.4",
     "discord.js": "^14.25.1",
     "minimist": "^1.2.8",
-    "mongoose": "^9.1.6",
+    "mongoose": "^9.2.1",
     "mongoose-autopopulate": "1.2.1",
     "numeral": "^2.0.6",
     "ofetch": "^1.5.1",
