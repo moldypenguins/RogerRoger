@@ -14,9 +14,7 @@ import Config from "../config/index.js"
 
 import DiscordCommands from "../commands/index.js"
 
-/**
- * Message create event handler
- */
+/** Interaction create event handler */
 const ev: DiscordEvent = {
   name: Events.InteractionCreate,
   once: false,
