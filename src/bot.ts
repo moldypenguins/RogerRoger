@@ -4,14 +4,10 @@
  * @summary Extended Discord client with custom bot functionality
  **/
 
-// node imports
-import util from "node:util"
-
 // module imports
-import { APIApplicationCommand, Client, GatewayIntentBits, Collection, REST, Routes } from "discord.js"
+import { APIApplicationCommand, Client, GatewayIntentBits, REST, Routes } from "discord.js"
 
 // local imports
-import type { DiscordCommand, DiscordEvent } from "./types"
 import Config from "./config"
 import DiscordEvents from "./events"
 import DiscordCommands from "./commands"
@@ -53,7 +49,7 @@ export class DiscordBot extends Client {
     ;(async () => {
       try {
         const botCommands = []
-        for (let [key, value] of Object.entries(DiscordCommands)) {
+        for (let [, value] of Object.entries(DiscordCommands)) {
           botCommands.push(value.data.toJSON())
         }
         const data = (await rest.put(Routes.applicationCommands(Config.discord.client_id), {
