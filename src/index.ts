@@ -35,5 +35,5 @@ Databank.connection.once("open", async () => {
 process.on("SIGINT", async () => {
   console.log("\nGracefully shutting down from SIGINT (Ctrl-C)")
   await discord_bot.shutdown()
-  process.exit(0)
+  process.exit()
 })
