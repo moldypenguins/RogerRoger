@@ -6,9 +6,8 @@
 "use strict"
 import util from "node:util"
 
-import type { Client, VoiceState } from "discord.js"
-import { Events, userMention, channelMention } from "discord.js"
-import type { DiscordEvent, DiscordGuildData } from "../types"
+import { Events, VoiceState, channelMention } from "discord.js"
+import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types"
 import Config from "../config"
 import { DiscordGuild } from "../databank"
 
@@ -16,7 +15,7 @@ import { DiscordGuild } from "../databank"
 const ev: DiscordEvent = {
   name: Events.VoiceStateUpdate,
   once: false,
-  async execute(client: Client, oldState: VoiceState, newState: VoiceState) {
+  async execute(client: DiscordBot, oldState: VoiceState, newState: VoiceState) {
     if (!oldState.member) return
     if (oldState.member.user.bot) return
     let _guild: DiscordGuildData | null = await DiscordGuild.findOne({ id: oldState.member.guild.id })

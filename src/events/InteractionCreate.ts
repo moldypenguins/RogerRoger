@@ -7,9 +7,9 @@
 
 import util from "node:util"
 
-import type { Client, Interaction } from "discord.js"
+import type { Interaction } from "discord.js"
 import { Events } from "discord.js"
-import type { DiscordEvent } from "../types"
+import type { DiscordBot, DiscordEvent } from "../types"
 import Config from "../config"
 // import { Databank } from "../databank"
 
@@ -21,7 +21,7 @@ import DiscordCommands from "../commands"
 const ev: DiscordEvent = {
   name: Events.InteractionCreate,
   once: false,
-  execute: async (client: Client, interaction: Interaction) => {
+  execute: async (client: DiscordBot, interaction: Interaction) => {
     if (
       !interaction.isChatInputCommand() &&
       !interaction.isButton() &&

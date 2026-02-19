@@ -6,15 +6,15 @@
 "use strict"
 
 //import util from "node:util"
-import type { DiscordEvent, DiscordGuildData } from "../types"
+import { Events, Guild } from "discord.js"
+import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types"
 import Config from "../config"
 import { DiscordGuild } from "../databank"
-import { type Client, Events, type Guild } from "discord.js"
 
 const ev: DiscordEvent = {
   name: Events.GuildCreate,
   once: false,
-  async execute(client: Client, guild: Guild) {
+  async execute(client: DiscordBot, guild: Guild) {
     if (Config.debug) console.log(`Discord: Joined guild ${guild.name} (${guild.id})!`)
 
     //DiscordGuildData

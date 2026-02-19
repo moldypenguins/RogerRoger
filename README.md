@@ -67,7 +67,9 @@ For development with auto-reload:
 
 ## Contact
 
+<a href="https://discord.gg/ExileDeadZone">
 <img src="https://raw.githubusercontent.com/ExileDeadZone/.github/main/images/discord.png" width="250" />
+</a>
 
 ## Licenses
 

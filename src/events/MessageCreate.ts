@@ -5,8 +5,8 @@
  **/
 "use strict"
 
-import { Client, Events, Message } from "discord.js"
-import type { DiscordEvent } from "../types"
+import { Events, Message } from "discord.js"
+import type { DiscordBot, DiscordEvent } from "../types"
 import Config from "../config"
 // import { Databank } from "../databank"
 
@@ -14,7 +14,7 @@ import Config from "../config"
 const ev: DiscordEvent = {
   name: Events.MessageCreate,
   once: false,
-  execute: (client: Client, message: Message) => {
+  execute: (client: DiscordBot, message: Message) => {
     if (message.author.bot) return
 
     // Handle message logic here

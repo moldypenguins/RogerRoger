@@ -5,8 +5,8 @@
  **/
 "use strict"
 
-import { Client, Events, GuildMember, roleMention } from "discord.js"
-import type { DiscordEvent, DiscordGuildData } from "../types"
+import { Events, GuildMember, roleMention } from "discord.js"
+import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types"
 import Config from "../config"
 import { DiscordGuild } from "../databank"
 
@@ -14,7 +14,7 @@ import { DiscordGuild } from "../databank"
 const ev: DiscordEvent = {
   name: Events.GuildMemberUpdate,
   once: false,
-  execute: async (client: Client, oldMember: GuildMember, newMember: GuildMember) => {
+  execute: async (client: DiscordBot, oldMember: GuildMember, newMember: GuildMember) => {
     let _guild: DiscordGuildData | null = await DiscordGuild.findOne({ id: oldMember.guild.id })
     if (!_guild) return
 
