@@ -1,3 +1,5 @@
+<h1 align="center">RogerRoger</h1></center>
+
 <p align="center">
 <a href="https://github.com/moldypenguins/RogerRoger">
 <img alt="RogerRoger" src=".github/images/RogerRoger.png" width="150"></center>
@@ -5,8 +7,6 @@
 </p>
 
 <p align="center"><i>Surrender Jedi dogs!</i></p>
-
-<h1 align="center">RogerRoger</h1></center>
 
 ***  
 [![License](https://img.shields.io/github/license/moldypenguins/RogerRoger?logo=GNU&style=for-the-badge&color=BD0000)][github-href]
