@@ -31,10 +31,7 @@ const ev: DiscordEvent = {
       return
     }
 
-    const commandName: string =
-      interaction.isChatInputCommand() || interaction.isAutocomplete()
-        ? interaction.commandName
-        : interaction.customId.split("_")[0]
+    const commandName: string = interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName : interaction.customId.split("_")[0]
 
     if (!Object.keys(DiscordCommands).includes(commandName)) {
       console.log(`COMMANDS: ${util.inspect(DiscordCommands, true, null, true)}`)

@@ -68,7 +68,7 @@
     "editor.indentSize": "tabSize",
     "editor.tabSize": 2,
     "editor.trimAutoWhitespace": true,
-    "editor.rulers": [120],
+    "editor.rulers": [160],
     "prettyxml.settings.indentSpaceLength": 2,
     "prettyxml.settings.positionAllAttributesOnFirstLine": true,
     "prettyxml.settings.preserveWhiteSpacesInComment": true,
@@ -90,7 +90,15 @@
       }
     },
     "enscript.modRoots": ["W:\\"],
-    "enscript.includePaths": ["P:\\Core", "P:\\DZ", "P:\\graphics", "P:\\gui", "P:\\languagecore", "P:\\scripts", "P:\\system"],
+    "enscript.includePaths": [
+      "P:\\Core",
+      "P:\\DZ",
+      "P:\\graphics",
+      "P:\\gui",
+      "P:\\languagecore",
+      "P:\\scripts",
+      "P:\\system"
+    ],
     "enscript.formatting.astylePath": "astyle",
     "enscript.formatting.arguments": [
       "--suffix=none",

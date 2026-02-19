@@ -3,7 +3,7 @@
  * @type {import("prettier").Config}
  */
 const config = {
-  printWidth: 120,
+  printWidth: 160,
   bracketSameLine: true,
   endOfLine: "lf",
   quoteProps: "consistent",
@@ -13,6 +13,6 @@ const config = {
   trailingComma: "none",
   singleQuote: false,
   requireConfig: false
-};
+}
 
-export default config;
+export default config
