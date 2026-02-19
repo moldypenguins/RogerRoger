@@ -3,7 +3,6 @@
  * @version 2026-02-19
  * @summary Handles message deletion events
  **/
-"use strict"
 
 import { Events, Message } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"

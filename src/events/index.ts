@@ -3,7 +3,6 @@
  * @version 2026-02-19
  * @summary Event handlers
  **/
-"use strict"
 
 import type { DiscordEvent } from "../types/index.js"
 import ChannelCreate from "./ChannelCreate.js"

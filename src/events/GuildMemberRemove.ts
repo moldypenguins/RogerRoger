@@ -3,7 +3,6 @@
  * @version 2026-02-04
  * @summary Handles guild member remove events
  **/
-"use strict"
 
 import { Events, GuildMember } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"

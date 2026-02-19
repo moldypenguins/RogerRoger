@@ -3,7 +3,6 @@
  * @version 2026-02-04
  * @summary Handles new message creation events
  **/
-"use strict"
 
 import { Events, Message } from "discord.js"
 import type { DiscordBot, DiscordEvent } from "../types/index.js"

@@ -3,7 +3,6 @@
  * @version 2026-02-19
  * @summary Handles channel deletion events
  **/
-"use strict"
 
 import { ChannelType, Events, GuildChannel } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"

@@ -3,7 +3,6 @@
  * @version 2026-02-04
  * @summary Handles guild member update events
  **/
-"use strict"
 
 import { Events, GuildMember, roleMention } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"

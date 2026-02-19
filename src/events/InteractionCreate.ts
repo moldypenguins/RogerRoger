@@ -3,7 +3,6 @@
  * @version 2026-02-04
  * @summary Handles interaction events (slash commands, buttons, etc.)
  **/
-"use strict"
 
 import util from "node:util"
 

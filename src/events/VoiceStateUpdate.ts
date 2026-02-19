@@ -3,8 +3,6 @@
  * @version 2026-02-04
  * @summary Handles voice state update events
  **/
-"use strict"
-import util from "node:util"
 
 import { Events, VoiceState, channelMention } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"

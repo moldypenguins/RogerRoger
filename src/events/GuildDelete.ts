@@ -3,7 +3,6 @@
  * @version 2026-02-19
  * @summary Handles bot removal from guild events
  **/
-"use strict"
 
 import { Events, Guild } from "discord.js"
 import type { DiscordBot, DiscordEvent } from "../types/index.js"

@@ -3,7 +3,6 @@
  * @version 2026-02-19
  * @summary Handles guild setting changes
  **/
-"use strict"
 
 import { Events, Guild } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"

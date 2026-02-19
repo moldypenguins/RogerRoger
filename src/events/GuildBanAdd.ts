@@ -3,7 +3,6 @@
  * @version 2026-02-19
  * @summary Handles user ban events
  **/
-"use strict"
 
 import { Events, GuildBan } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"

@@ -3,7 +3,6 @@
  * @version 2026-02-19
  * @summary Handles bulk message deletion events
  **/
-"use strict"
 
 import { Collection, Events, Message, Snowflake } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
