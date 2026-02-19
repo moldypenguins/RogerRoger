@@ -61,7 +61,6 @@ const commandRoleReaction: DiscordCommand = {
 
     if (!interaction.channel) return
     const _channel = client.channels.cache.get(interaction.channel.id)
-    if (!_channel || !_channel.isTextBased()) return
 
     if (interaction.isChatInputCommand()) {
       let _title = interaction.options.getString("title")
@@ -96,12 +95,13 @@ const commandRoleReaction: DiscordCommand = {
           new ActionRowBuilder<RoleSelectMenuBuilder>({ components: [role] }),
           new ActionRowBuilder<ButtonBuilder>({ components: [post, cancel] })
         ],
-        ephemeral: false,
-        flags: MessageFlags.IsComponentsV2
+        ephemeral: false
+        //flags: MessageFlags.IsComponentsV2
       })
     } else if (interaction.isButton()) {
       let _command = interaction.customId.split("_")[1]
       if (_command == "post") {
+        if (!_channel || !_channel.isTextBased()) return
         await _channel.messages
           .fetch(interaction.message.id)
           .then((message: Message) => {
@@ -126,6 +126,7 @@ const commandRoleReaction: DiscordCommand = {
             console.log(`Error: ${err}`)
           })
       } else if (_command == "cancel") {
+        if (!_channel || !_channel.isTextBased()) return
         await _channel.messages
           .fetch(interaction.message.id)
           .then((message: Message) => message.delete())
@@ -235,6 +236,7 @@ const commandRoleReaction: DiscordCommand = {
           components: [_components]
         })
 
+        if (!_channel || !_channel.isTextBased()) return
         await _channel.messages
           .fetch(interaction.message.id)
           .then((message: Message) => message.delete())
@@ -243,6 +245,7 @@ const commandRoleReaction: DiscordCommand = {
           })
 
         interaction.deferUpdate()
+        //TODO: add to databank and send confirmation in ephemeral
       }
     } else if (interaction.isModalSubmit()) {
       let _command = interaction.customId.split("_")[1]
@@ -254,6 +257,7 @@ const commandRoleReaction: DiscordCommand = {
         let _description = interaction.fields.getTextInputValue("description")
 
         try {
+          if (!_channel || !_channel.isTextBased()) return
           await _channel.messages.fetch(_message).then((message: Message) => {
             let _embed = EmbedBuilder.from(message.embeds[0]).data
             if (!_embed.fields) {
