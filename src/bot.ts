@@ -12,9 +12,7 @@ import Config from "./config"
 import DiscordEvents from "./events"
 import DiscordCommands from "./commands"
 
-/**
- * Extended Discord Client with command and event handling
- */
+/** Extended discord.js Client with command and event handling */
 export class DiscordBot extends Client {
   /** Creates a new DiscordBot instance */
   constructor() {
@@ -79,8 +77,6 @@ export class DiscordBot extends Client {
     /** Login */
     console.log("Attempting login...")
     await this.login(Config.discord.token)
-    //EDZ: 1235712833468104765
-    //TOR:  549157326137851904
   }
 
   /** Gracefully shuts down the bot */
