@@ -1,15 +1,15 @@
 /**
  * @name GuildCreate.ts
  * @version 2026-02-05
- * @summary GuildCreate event hadler
+ * @summary Handles guild join events
  **/
 
-//import util from "node:util"
 import { Events, Guild } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
 
+/** Guild create event handler */
 const ev: DiscordEvent = {
   name: Events.GuildCreate,
   once: false,

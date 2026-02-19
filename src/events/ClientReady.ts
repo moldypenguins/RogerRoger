@@ -9,9 +9,7 @@ import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.
 import Config from "../config/index.js"
 import { DiscordGuild, DiscordUser } from "../databank/index.js"
 
-/**
- * Ready event handler - fires once when the bot is ready
- */
+/** Client ready event handler */
 const ev: DiscordEvent = {
   name: Events.ClientReady,
   once: true,
