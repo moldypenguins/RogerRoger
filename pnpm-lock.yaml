@@ -27,11 +27,11 @@ importers:
         specifier: ^1.2.8
         version: 1.2.8
       mongoose:
-        specifier: ^9.2.1
-        version: 9.2.1
+        specifier: ^9.2.3
+        version: 9.2.3
       mongoose-autopopulate:
         specifier: 1.2.1
-        version: 1.2.1(mongoose@9.2.1)
+        version: 1.2.1(mongoose@9.2.3)
       numeral:
         specifier: ^2.0.6
         version: 2.0.6
@@ -1107,8 +1107,8 @@ packages:
     peerDependencies:
       mongoose: 6.x || 7.x || 8.x || ^9.0.0-0
 
-  mongoose@9.2.1:
-    resolution: {integrity: sha512-fmNLwgct5km7iL1MqvTMncarR1E1TIw2lmc9A4UoDVdS7AQe95K+DnRK0qATkSUdwUC9V/5wlDcqnkQQjbSRkA==}
+  mongoose@9.2.3:
+    resolution: {integrity: sha512-4XFKKkXUOsdY+p07eJyio4mk0rzZOT4n5r5tLqZNeRZ/IsS68vS8Szw8uShX4p7S687XGGc+MFAp+6K1OIN0aw==}
     engines: {node: '>=20.19.0'}
 
   mpath@0.9.0:
@@ -2502,11 +2502,11 @@ snapshots:
       bson: 7.2.0
       mongodb-connection-string-url: 7.0.1
 
-  mongoose-autopopulate@1.2.1(mongoose@9.2.1):
+  mongoose-autopopulate@1.2.1(mongoose@9.2.3):
     dependencies:
-      mongoose: 9.2.1
+      mongoose: 9.2.3
 
-  mongoose@9.2.1:
+  mongoose@9.2.3:
     dependencies:
       kareem: 3.2.0
       mongodb: 7.0.0
