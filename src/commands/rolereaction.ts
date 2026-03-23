@@ -36,6 +36,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
   StringSelectMenuOptionBuilder,
+  Component,
   ComponentType,
   TextDisplayComponent,
   SectionComponent,
@@ -43,9 +44,12 @@ import {
   ButtonComponent,
   RoleSelectMenuComponent,
   StringSelectMenuComponent,
-  ChannelType
+  ChannelType,
+  TextDisplayComponentData
 } from "discord.js"
 
+// local imports
+import Config from "../config/index.js"
 import type { DiscordBot, DiscordCommand, DiscordGuildData, RoleReactionMessageData, RoleReactionData } from "../types/index.js"
 import { Databank, DiscordGuild, RoleReaction } from "../databank/index.js"
 import { isSnowflake } from "../utils.js"
@@ -237,9 +241,29 @@ const commandRoleReaction: DiscordCommand = {
     .setDescription("Create a new role reaction message.")
     .setContexts([InteractionContextType.Guild])
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addStringOption((option) => option.setName("title").setDescription("The role reaction title.").setRequired(true).setMaxLength(255))
-    .addStringOption((option) => option.setName("description").setDescription("The role reaction description.").setRequired(true).setMaxLength(2000))
-    .addStringOption((option) => option.setName("color").setDescription("The role reaction color hex.").setRequired(false).setMinLength(6).setMaxLength(6)),
+
+    // CUDL operations
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("create")
+        .setDescription("Create a new role reaction message.")
+        .addStringOption((option) => option.setName("title").setDescription("The role reaction title.").setRequired(true).setMaxLength(255))
+        .addStringOption((option) => option.setName("description").setDescription("The role reaction description.").setRequired(true).setMaxLength(2000))
+        .addStringOption((option) => option.setName("color").setDescription("The role reaction color hex.").setRequired(false).setMinLength(6).setMaxLength(6))
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("update")
+        .setDescription("Update an existing role reaction message.")
+        .addStringOption((option) => option.setName("messageId").setDescription("The message id.").setRequired(true).setMaxLength(64))
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("delete")
+        .setDescription("Delete an existing role reaction message.")
+        .addStringOption((option) => option.setName("messageId").setDescription("The message id.").setRequired(true).setMaxLength(64))
+    )
+    .addSubcommand((subcommand) => subcommand.setName("list").setDescription("List all existing role reaction messages.")),
 
   async execute(client: DiscordBot, interaction: Interaction): Promise<void> {
     if (!interaction.guild) return
@@ -249,39 +273,66 @@ const commandRoleReaction: DiscordCommand = {
     const _channel = client.channels.cache.get(_chan.id) as Channel
 
     if (interaction.isChatInputCommand()) {
-      const m_title = interaction.options.getString("title") as string
-      const m_description = interaction.options.getString("description") as string
-      const o_colour = interaction.options.getString("color")
-      const m_color: number = o_colour ? parseInt(o_colour, 16) : _guild.embedColor
+      const _subcommand = interaction.options.getSubcommand()
 
-      // Send discord reply
-      await interaction.reply({
-        components: [createLoading(m_color, m_title, m_description)],
-        flags: MessageFlags.IsComponentsV2 | MessageFlags.Loading
-      })
-      const reply = await interaction.fetchReply()
+      switch (_subcommand) {
+        case "create":
+          const m_title = interaction.options.getString("title") as string
+          const m_description = interaction.options.getString("description") as string
+          const o_colour = interaction.options.getString("color")
+          const m_color: number = o_colour ? parseInt(o_colour, 16) : _guild.embedColor
 
-      // create documents
-      const doc = await new RoleReaction({
-        _id: new Databank.Types.ObjectId(),
-        guild: _guild._id,
-        title: m_title,
-        description: m_description,
-        color: m_color,
-        reactions: [{ _id: new Databank.Types.ObjectId() }],
-        messageId: reply.id
-      }).save()
+          // Send discord reply
+          await interaction.reply({
+            components: [createLoading(m_color, m_title, m_description)],
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.Loading
+          })
+          const reply = await interaction.fetchReply()
 
-      // Update reply with created container component and buttons
-      await reply.edit({
-        components: [await createComponent(interaction, doc), createButtons(doc)],
-        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-      })
+          // create document
+          const c_doc = await new RoleReaction({
+            _id: new Databank.Types.ObjectId(),
+            guild: _guild._id,
+            title: m_title,
+            description: m_description,
+            color: m_color,
+            reactions: [{ _id: new Databank.Types.ObjectId() }],
+            messageId: reply.id
+          }).save()
+
+          // Update reply with created container component and buttons
+          await reply.edit({
+            components: [await createComponent(interaction, c_doc), createButtons(c_doc)],
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+          })
+
+          break
+        case "update":
+          const m_messageId = interaction.options.getString("messageId") as string
+
+          // retrieve document
+          const u_doc = await RoleReaction.findOne({ messageId: m_messageId })
+          if (!u_doc) return
+
+          // Reply with created container component and buttons
+          await interaction.reply({
+            components: [await createComponent(interaction, u_doc), createButtons(u_doc)],
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+          })
+
+          break
+        case "delete":
+          break
+        case "list":
+          break
+      }
     } else if (interaction.isButton()) {
       // Require a text based channel
       if (!_channel.isTextBased() || !_channel.isSendable()) return
       // Get interaction params
       const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
+      if (Config.debug) console.log(`Button pressed: ${_action}`)
+
       const _pagenum: number = parseInt(_page ?? "0", 10)
       const _message = await _channel.messages.fetch(_messageId)
 
@@ -427,11 +478,12 @@ const commandRoleReaction: DiscordCommand = {
     } else if (interaction.isChannelSelectMenu()) {
       // Require a text based channel
       if (!_channel.isTextBased() || !_channel.isSendable()) return
+
+      await interaction.deferUpdate()
+
       // Get interaction params
       const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
       const _message = await _channel.messages.fetch(_messageId)
-
-      await interaction.deferUpdate()
 
       if (_action === "selectchannel") {
         const targetChannel = client.channels.cache.get(interaction.values[0] ?? "")
