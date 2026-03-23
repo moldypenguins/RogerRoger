@@ -342,11 +342,14 @@ const commandRoleReaction: DiscordCommand = {
           flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
         })
       } else if (_action === "cancel") {
-        // delete from database
+        // Delete from database
         await RoleReaction.deleteOne({ messageId: _messageId })
         // delete from discord
         const message = await _channel.messages.fetch(interaction.message.id)
         await message.delete()
+
+        // Delete the edit message
+        await _message.delete()
       } else if (_action === "react" && _reaction) {
         if (!interaction.member) return
 
