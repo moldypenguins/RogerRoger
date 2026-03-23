@@ -1,38 +1,236 @@
 /**
- * @name rolereaction.ts
- * @version 2026-02-03
- * @summary Role reaction commands
- **/
+ * @file commands/rolereaction.ts
+ * @description Role reaction commands for creating interactive role assignment messages
+ * @version 2026-02-19
+ */
+
+import util from "node:util"
 
 import {
+  APISelectMenuOption,
+  APIRole,
+  ModalBuilder,
   ContainerBuilder,
+  ContainerComponent,
   SlashCommandBuilder,
-  //
+  SeparatorSpacingSize,
+  ActionRow,
+  MessageActionRowComponent,
+  Guild,
   GuildMemberRoleManager,
+  GuildEmoji,
+  Role,
   Interaction,
-  LabelBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   ChannelSelectMenuBuilder,
   Channel,
   InteractionContextType,
-  EmbedBuilder,
-  Message,
-  ModalBuilder,
+  StringSelectMenuBuilder,
   PermissionFlagsBits,
   RoleSelectMenuBuilder,
-  TextInputBuilder,
-  TextInputStyle,
   roleMention,
   MessageFlags,
   TextBasedChannel,
-  UserSelectMenuBuilder
+  TextInputBuilder,
+  TextInputStyle,
+  StringSelectMenuOptionBuilder,
+  ComponentType,
+  TextDisplayComponent,
+  SectionComponent,
+  LabelBuilder,
+  ButtonComponent,
+  RoleSelectMenuComponent,
+  StringSelectMenuComponent,
+  ChannelType
 } from "discord.js"
 
-import type { DiscordBot, DiscordCommand, DiscordGuildData } from "../types/index.js"
-import { DiscordGuild } from "../databank/index.js"
+import type { DiscordBot, DiscordCommand, DiscordGuildData, RoleReactionMessageData, RoleReactionData } from "../types/index.js"
+import { Databank, DiscordGuild, RoleReaction } from "../databank/index.js"
+import { isSnowflake } from "../utils.js"
 
+const IDS = {
+  LOADING: 412565817,
+  CONTAINER: 555798250,
+  ROLEREACTIONS: 303777619,
+  SECTION: 933374421,
+  DETAILS: 897811392
+}
+
+const EMOJISPERPAGE = 24
+
+const createLoading = (color: number, title: string, description: string) => {
+  return new ContainerBuilder()
+    .setId(IDS.LOADING)
+    .setAccentColor(color)
+    .addTextDisplayComponents(
+      (textDisplay) => textDisplay.setContent(`# ${title}`),
+      (textDisplay) => textDisplay.setContent(`***${description.replace(/\\n/g, "\n")}***`)
+    )
+    .addSeparatorComponents((separator) => separator.setDivider(false).setSpacing(SeparatorSpacingSize.Large))
+    .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Loading..."))
+}
+
+/**
+ * Creates a container UI component for role reaction setup with emoji pagination
+ */
+const createComponent = async (interaction: Interaction, document: RoleReactionMessageData, page: string = "0") => {
+  if (!interaction.guild || !interaction.channel) throw new Error("Command must be used in a guild channel.")
+
+  const pagenum = parseInt(page, 10)
+  const emojis = Array.from(interaction.guild.emojis.cache.values())
+  const _reaction: RoleReactionData = document.reactions.find((r) => r.published === false) as RoleReactionData
+
+  const _container = new ContainerBuilder()
+    .setId(IDS.CONTAINER)
+    .setAccentColor(document.color)
+    .addTextDisplayComponents(
+      (textDisplay) => textDisplay.setContent(`# ${document.title}`),
+      (textDisplay) => textDisplay.setContent(`***${document.description.replace(/\\n/g, "\n")}***`)
+    )
+    .addSeparatorComponents((separator) => separator.setSpacing(SeparatorSpacingSize.Large))
+    .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Role Reactions:").setId(IDS.ROLEREACTIONS))
+
+  const _published: RoleReactionData[] = document.reactions.filter((m) => m.published === true)
+  if (_published.length > 0) {
+    for (const reaction of _published) {
+      const emoji = emojis.find((e) => e.id === reaction.emojiId) as GuildEmoji
+      const details = reaction.details.length > 0 ? `\n  - ${reaction.details}` : ""
+      _container.addTextDisplayComponents((textDisplay) => textDisplay.setContent(`- ${emoji} <@&${reaction.roleId}>${details}`))
+    }
+  }
+
+  if (!isSnowflake(document.postId)) {
+    const totalPages = Math.ceil(emojis.length / EMOJISPERPAGE)
+    const start = pagenum * EMOJISPERPAGE
+    const currentEmojis = emojis.slice(start, start + EMOJISPERPAGE)
+
+    const emojiSelect = new StringSelectMenuBuilder()
+      .setCustomId(`rolereaction_selectemoji_${document.editId}_${pagenum}`)
+      .setPlaceholder("Select emoji")
+      .addOptions(
+        currentEmojis.map((emoji: GuildEmoji) => {
+          return new StringSelectMenuOptionBuilder()
+            .setLabel(`${emoji.name}`)
+            .setValue(emoji.id)
+            .setEmoji(emoji.animated ? `<a:${emoji.name}:${emoji.id}>` : `<:${emoji.name}:${emoji.id}>`)
+            .setDefault(_reaction.emojiId.length > 0 && _reaction.emojiId === emoji.id)
+        })
+      )
+
+    const roleSelect = new RoleSelectMenuBuilder()
+      .setCustomId(`rolereaction_selectrole_${document.editId}_${pagenum}`)
+      .setPlaceholder("Select role")
+      .setRequired()
+      .setMinValues(1)
+      .setMaxValues(1)
+
+    if (isSnowflake(_reaction.roleId)) {
+      roleSelect.setDefaultRoles([_reaction.roleId])
+    }
+
+    const channelSelect = new ChannelSelectMenuBuilder()
+      .setChannelTypes(ChannelType.GuildText)
+      .setCustomId(`rolereaction_selectchannel_${document.editId}_${pagenum}`)
+      .setPlaceholder("Select channel")
+      .setRequired()
+      .setMinValues(1)
+      .setMaxValues(1)
+
+    if (isSnowflake(document.channelId)) {
+      channelSelect.setDefaultChannels([document.channelId])
+    }
+
+    _container
+      .addSeparatorComponents((separator) => separator.setSpacing(SeparatorSpacingSize.Large))
+      .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Channel:"))
+      .addActionRowComponents((actionRow) => actionRow.setComponents(channelSelect))
+      .addSeparatorComponents((separator) => separator.setSpacing(SeparatorSpacingSize.Large))
+      .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Emoji:"))
+
+    const emojiButtons = [
+      new ButtonBuilder()
+        .setCustomId(`rolereaction_prevemoji_${document.editId}_${pagenum}`)
+        .setLabel("❰ 𝗣𝗥𝗘𝗩")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(pagenum === 0),
+      new ButtonBuilder()
+        .setCustomId(`rolereaction_nextemoji_${document.editId}_${pagenum}`)
+        .setLabel("𝗡𝗘𝗫𝗧 ❱")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(pagenum === totalPages)
+    ]
+
+    if (_reaction.emojiId.length > 0) {
+      _container.addActionRowComponents(
+        (actionRow) => actionRow.setComponents(emojiSelect),
+        (actionRow) => actionRow.setComponents(emojiButtons)
+      )
+    } else {
+      _container.addActionRowComponents(
+        (actionRow) => actionRow.setComponents(emojiSelect),
+        (actionRow) => actionRow.setComponents(emojiButtons)
+      )
+    }
+
+    _container
+      .addSeparatorComponents((separator) => separator.setDivider(false).setSpacing(SeparatorSpacingSize.Small))
+      .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Role:"))
+      .addActionRowComponents((actionRow) => actionRow.setComponents(roleSelect))
+      .addSeparatorComponents((separator) => separator.setDivider(false).setSpacing(SeparatorSpacingSize.Small))
+      .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Details:"))
+      .addSectionComponents((section) =>
+        section
+          .addTextDisplayComponents((textDisplay) =>
+            textDisplay.setContent(_reaction.details.length > 0 ? `> ### ${_reaction.details}` : "> ").setId(IDS.DETAILS)
+          )
+          .setButtonAccessory((button) =>
+            button.setCustomId(`rolereaction_editdetails_${document.editId}_${pagenum}`).setLabel("𝗘𝗗𝗜𝗧 ✎").setStyle(ButtonStyle.Secondary)
+          )
+      )
+      .addSeparatorComponents((separator) => separator.setSpacing(SeparatorSpacingSize.Large))
+      .addSectionComponents((section) =>
+        section
+          .addTextDisplayComponents((textDisplay) => textDisplay.setContent("‎"))
+          .setButtonAccessory((button) =>
+            button
+              .setCustomId(`rolereaction_add_${document.editId}_${pagenum}`)
+              .setLabel("𝗔𝗗𝗗 ✚")
+              .setStyle(ButtonStyle.Success)
+              .setDisabled(_reaction.emojiId.length <= 0 || _reaction.roleId.length <= 0)
+          )
+      )
+  }
+
+  return _container
+}
+
+/**
+ * Creates an action row for command buttons
+ */
+const createButtons = (document: RoleReactionMessageData) => {
+  const _post = document.reactions.filter((r) => r.published === true).length > 0 && isSnowflake(document.channelId)
+  return new ActionRowBuilder<ButtonBuilder>({
+    components: [
+      new ButtonBuilder().setCustomId(`rolereaction_post_${document.editId}`).setLabel("Post").setStyle(ButtonStyle.Primary).setDisabled(!_post),
+      new ButtonBuilder().setCustomId(`rolereaction_cancel_${document.editId}`).setLabel("Cancel").setStyle(ButtonStyle.Danger)
+    ]
+  })
+}
+
+/**
+ * Creates an action row for reaction buttons
+ */
+const createReactions = (document: RoleReactionMessageData) => {
+  return new ActionRowBuilder<ButtonBuilder>({
+    components: [new ButtonBuilder().setCustomId(`rolereaction_post_${document.editId}`).setLabel("Post").setStyle(ButtonStyle.Secondary)]
+  })
+}
+
+/**
+ * Discord Command
+ */
 const commandRoleReaction: DiscordCommand = {
   data: new SlashCommandBuilder()
     .setName("rolereaction")
@@ -42,199 +240,244 @@ const commandRoleReaction: DiscordCommand = {
     .addStringOption((option) => option.setName("title").setDescription("The role reaction title.").setRequired(true).setMaxLength(255))
     .addStringOption((option) => option.setName("description").setDescription("The role reaction description.").setRequired(true).setMaxLength(2000))
     .addStringOption((option) => option.setName("color").setDescription("The role reaction color hex.").setRequired(false).setMinLength(6).setMaxLength(6)),
-  async execute(client: DiscordBot, interaction: Interaction): Promise<void> {
-    let _guild = (await DiscordGuild.findOne({ id: interaction.guildId })) as DiscordGuildData
 
+  async execute(client: DiscordBot, interaction: Interaction): Promise<void> {
+    if (!interaction.guild) return
+
+    const _guild = (await DiscordGuild.findOne({ id: interaction.guild.id })) as DiscordGuildData
     const _chan = interaction.channel as TextBasedChannel
     const _channel = client.channels.cache.get(_chan.id) as Channel
 
     if (interaction.isChatInputCommand()) {
-      let _title = interaction.options.getString("title") as string
-      let _description = interaction.options.getString("description") as string
-      let _color = interaction.options.getString("color") as string
+      const m_title = interaction.options.getString("title") as string
+      const m_description = interaction.options.getString("description") as string
+      const o_colour = interaction.options.getString("color")
+      const m_color: number = o_colour ? parseInt(o_colour, 16) : _guild.embedColor
 
-      const post = new ButtonBuilder().setCustomId("rolereaction_post").setLabel("Post").setStyle(ButtonStyle.Primary)
-      const cancel = new ButtonBuilder().setCustomId("rolereaction_cancel").setLabel("Cancel").setStyle(ButtonStyle.Danger)
-
-      const container = new ContainerBuilder()
-        .setAccentColor(parseInt(_color, 16))
-        .addTextDisplayComponents(
-          (textDisplay) => textDisplay.setContent(`#${_title}`),
-          (textDisplay) => textDisplay.setContent(`${_description.replace(/\\n/g, "\n")}`)
-        )
-        .addSeparatorComponents((separator) => separator)
-        .addTextDisplayComponents((textDisplay) => textDisplay.setContent("And you can place one button or one thumbnail component next to it!"))
-        .addActionRowComponents((actionRow) =>
-          actionRow.setComponents(new RoleSelectMenuBuilder().setCustomId("rolereaction_role").setPlaceholder("Role").setMinValues(1).setMaxValues(1))
-        )
-
+      // Send discord reply
       await interaction.reply({
-        components: [container, new ActionRowBuilder<ButtonBuilder>({ components: [post, cancel] })],
-        flags: MessageFlags.IsComponentsV2
+        components: [createLoading(m_color, m_title, m_description)],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.Loading
+      })
+      const reply = await interaction.fetchReply()
+
+      // create documents
+      const doc = await new RoleReaction({
+        _id: new Databank.Types.ObjectId(),
+        guild: _guild._id,
+        title: m_title,
+        description: m_description,
+        color: m_color,
+        reactions: [{ _id: new Databank.Types.ObjectId() }],
+        messageId: reply.id
+      }).save()
+
+      // Update reply with created container component and buttons
+      await reply.edit({
+        components: [await createComponent(interaction, doc), createButtons(doc)],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     } else if (interaction.isButton()) {
-      let _command = interaction.customId.split("_")[1]
-      if (_command == "post") {
-        if (!_channel.isTextBased()) return
-        await _channel.messages
-          .fetch(interaction.message.id)
-          .then((message: Message) => {
-            let _channel = new ChannelSelectMenuBuilder().setCustomId("rolereaction_channel").setPlaceholder("Channel").setMinValues(1).setMaxValues(1)
-            let _cancel = new ButtonBuilder().setCustomId("rolereaction_cancel").setLabel("Cancel").setStyle(ButtonStyle.Danger)
-            message.edit({
-              components: [
-                new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(_channel),
-                new ActionRowBuilder<ButtonBuilder>().addComponents(_cancel)
-              ]
-            })
-            interaction.deferUpdate()
-          })
-          .catch((err) => {
-            console.log(`Error: ${err}`)
-          })
-      } else if (_command == "cancel") {
-        if (!_channel.isTextBased()) return
-        await _channel.messages
-          .fetch(interaction.message.id)
-          .then((message: Message) => message.delete())
-          .catch((err) => {
-            console.log(`Error: ${err}`)
-          })
-      } else if (_command == "react") {
+      // Require a text based channel
+      if (!_channel.isTextBased() || !_channel.isSendable()) return
+      // Get interaction params
+      const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
+      const _pagenum: number = parseInt(_page ?? "0", 10)
+      const _message = await _channel.messages.fetch(_messageId)
+
+      const currentDoc = await RoleReaction.findOne<RoleReactionMessageData>({ messageId: _messageId })
+      if (!currentDoc) return
+
+      const _reaction: RoleReactionData | undefined = currentDoc.reactions.find((r) => r.published === false)
+
+      const emojis = Array.from(interaction.guild.emojis.cache.values())
+      const totalPages = Math.ceil(emojis.length / EMOJISPERPAGE)
+
+      if (_action === "nextemoji" && _pagenum < totalPages) {
+        await interaction.update({
+          components: [await createComponent(interaction, currentDoc, `${_pagenum + 1}`), createButtons(currentDoc)],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+        })
+      } else if (_action === "prevemoji" && _pagenum > 0) {
+        await interaction.update({
+          components: [await createComponent(interaction, currentDoc, `${_pagenum - 1}`), createButtons(currentDoc)],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+        })
+      } else if (_action === "post") {
+        await interaction.deferUpdate()
+
+        // Delete the edit message
+        await _message.delete()
+
+        // Remove unpublished role reaction
+        if (_reaction)
+          await RoleReaction.updateOne({ messageId: _messageId }, { $set: { "reactions.$[r]": undefined } }, { arrayFilters: [{ "r._id": _reaction._id }] })
+
+        // Get target channel
+        const _target = client.channels.cache.get(currentDoc.channelId)
+        if (!_target || !_target.isTextBased() || !_target.isSendable()) return
+
+        // Post to target channel
+        const _post = await _target.send({
+          components: [createLoading(currentDoc.color, currentDoc.title, currentDoc.description)],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+        })
+
+        // Update record
+        const updated = await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+          { messageId: _messageId },
+          { $set: { editId: "", postId: _post.id } },
+          { returnDocument: "after" }
+        )
+        if (!updated) return
+
+        // Send confirmation to user
+        await _channel.send({
+          components: [
+            new ContainerBuilder()
+              .setId(IDS.CONTAINER)
+              .setAccentColor(_guild.embedColor)
+              .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### Role Reaction message posted in <#${_target.id}>`))
+          ],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+        })
+      } else if (_action === "cancel") {
+        // delete from database
+        await RoleReaction.deleteOne({ messageId: _messageId })
+        // delete from discord
+        const message = await _channel.messages.fetch(interaction.message.id)
+        await message.delete()
+      } else if (_action === "react" && _reaction) {
         if (!interaction.member) return
 
-        let _role = interaction.customId.split("_")[2]
+        const roles = interaction.member.roles as GuildMemberRoleManager
+        const hasRole = roles.cache.has(`${_reaction._id}`)
 
-        const _roles = interaction.member.roles as GuildMemberRoleManager
-
-        if (_roles.cache.has(_role)) {
-          await _roles.remove(_role)
+        if (hasRole) {
+          await roles.remove(`${_reaction._id}`)
         } else {
-          await _roles.add(_role)
+          await roles.add(`${_reaction._id}`)
         }
+
         await interaction.reply({
           embeds: [
             {
               color: _guild.embedColor,
-              title: `Role ${_roles.cache.has(_role) ? "Added" : "Removed"}`,
-              description: roleMention(_role),
-              fields: []
+              title: `Role ${hasRole ? "Removed" : "Added"}`,
+              description: roleMention(`${_reaction._id}`)
             }
           ],
           ephemeral: true
         })
-      }
-    } else if (interaction.isRoleSelectMenu()) {
-      let _command = interaction.customId.split("_")[1]
-
-      if (_command == "role") {
-        let _role = interaction.values[0]
-
-        const modal = new ModalBuilder().setCustomId(`rolereaction_add_${interaction.message.id}_${_role}`).setTitle("Add Emoji")
-
-        const emojiInput = new TextInputBuilder().setCustomId("emoji").setLabel("Emoji").setRequired(true).setStyle(TextInputStyle.Short)
-
-        const descriptionInput = new TextInputBuilder()
-          .setCustomId("description")
-          .setLabel("Description")
-          .setRequired(false)
-          .setMaxLength(255)
-          .setStyle(TextInputStyle.Short)
-
-        modal.components.push(new ActionRowBuilder<TextInputBuilder>().addComponents(emojiInput))
-        modal.components.push(new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput))
-
+      } else if (_action === "editdetails" && _reaction) {
+        const modal = new ModalBuilder().setCustomId(`rolereaction_savedetails_${interaction.message.id}`).setTitle("Add Details")
+        modal.components.push(
+          new ActionRowBuilder<TextInputBuilder>().addComponents(
+            new TextInputBuilder().setCustomId("details").setLabel("Details (Optional):").setRequired(false).setMaxLength(255).setStyle(TextInputStyle.Short)
+          )
+        )
         await interaction.showModal(modal)
-      }
-    } else if (interaction.isChannelSelectMenu()) {
-      let _command = interaction.customId.split("_")[1]
+      } else if (_action === "add") {
+        await RoleReaction.updateOne({ messageId: _messageId }, { $set: { "reactions.$[r].published": true } }, { arrayFilters: [{ "r.published": false }] })
 
-      if (_command == "channel") {
-        const _postchan = client.channels.cache.get(interaction.values[0])
-        if (!_postchan || !_postchan.isTextBased() || !_postchan.isSendable()) return
+        const updated = await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+          { messageId: _messageId },
+          { $push: { reactions: { _id: new Databank.Types.ObjectId() } } },
+          { returnDocument: "after" }
+        )
+        if (!updated) return
 
-        let _components = new ActionRowBuilder<ButtonBuilder>()
-        for (let _id in interaction.message.embeds[0].fields) {
-          let _values = interaction.message.embeds[0].fields[_id].value.split(": ")
-
-          if (_values[1].includes("\n")) {
-            let _vals = _values[1].split("\n")
-            _values[1] = _vals[0]
-            _values[2] = _vals[1]
-          }
-
-          const _text = _values[1].match(/^<@&(\d+)>$/)
-          if (!_text) return
-
-          _components.addComponents(new ButtonBuilder().setCustomId(`rolereaction_react_${_text[1]}`).setEmoji(_values[0]).setStyle(ButtonStyle.Secondary))
-        }
-
-        interaction.message.embeds[0].fields.unshift({
-          name: "",
-          value: "\u200b",
-          inline: false
+        const _message = await _channel.messages.fetch(_messageId)
+        await _message.edit({
+          components: [await createComponent(interaction, updated), createButtons(updated)],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
         })
-        interaction.message.embeds[0].fields.push({
-          name: "",
-          value: "\u200b",
-          inline: false
-        })
-
-        _postchan.send({
-          embeds: [
-            {
-              color: interaction.message.embeds[0].color ?? undefined,
-              title: interaction.message.embeds[0].title ?? undefined,
-              description: interaction.message.embeds[0].description ?? undefined,
-              fields: interaction.message.embeds[0].fields
-            }
-          ],
-          components: [_components]
-        })
-
-        if (!_channel.isTextBased()) return
-        await _channel.messages
-          .fetch(interaction.message.id)
-          .then((message: Message) => message.delete())
-          .catch((err) => {
-            console.log(`Error: ${err}`)
-          })
-
-        interaction.deferUpdate()
-        //TODO: add to databank and send confirmation in ephemeral
       }
     } else if (interaction.isModalSubmit()) {
-      let _command = interaction.customId.split("_")[1]
+      // Require a text based channel
+      if (!_channel.isTextBased() || !_channel.isSendable()) return
+      // Get interaction params
+      const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
+      const _message = await _channel.messages.fetch(_messageId)
 
-      if (_command == "add") {
-        let _message = interaction.customId.split("_")[2]
-        let _role = interaction.customId.split("_")[3]
-        let _emoji = interaction.fields.getTextInputValue("emoji")
-        let _description = interaction.fields.getTextInputValue("description")
+      await interaction.deferUpdate()
 
-        try {
-          if (!_channel.isTextBased()) return
-          await _channel.messages.fetch(_message).then((message: Message) => {
-            let _embed = EmbedBuilder.from(message.embeds[0]).data
-            if (!_embed.fields) {
-              _embed.fields = []
-            }
-            _embed.fields.push({
-              name: "",
-              value: `${_emoji}: ${roleMention(_role)}` + (_description ? `\n${_description}` : "") + "\n",
-              inline: false
-            })
+      const currentDoc = await RoleReaction.findOne<RoleReactionMessageData>({ messageId: _messageId })
+      if (!currentDoc) return
+      const _reaction: RoleReactionData | undefined = currentDoc.reactions.find((r) => r.published === false)
 
-            message.edit({
-              embeds: [_embed]
-            })
+      if (_action == "savedetails" && _reaction) {
+        const _details = interaction.fields.getTextInputValue("details") ?? ""
+        const updated = (await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+          { messageId: _messageId },
+          { $set: { "reactions.$[r].details": _details } },
+          {
+            arrayFilters: [{ "r._id": _reaction._id }],
+            returnDocument: "after"
+          }
+        )) as RoleReactionMessageData
+        await _message.edit({
+          components: [await createComponent(interaction, updated), createButtons(updated)],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+        })
+      }
+    } else if (interaction.isChannelSelectMenu()) {
+      // Require a text based channel
+      if (!_channel.isTextBased() || !_channel.isSendable()) return
+      // Get interaction params
+      const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
+      const _message = await _channel.messages.fetch(_messageId)
 
-            interaction.deferUpdate()
-            return
-          })
-        } catch (err) {
-          console.log(`Error: ${err}`)
-        }
+      await interaction.deferUpdate()
+
+      if (_action === "selectchannel") {
+        const targetChannel = client.channels.cache.get(interaction.values[0] ?? "")
+        if (!targetChannel || !targetChannel.isTextBased() || !targetChannel.isSendable()) return
+
+        const updated = (await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+          { messageId: _messageId },
+          { $set: { channelId: targetChannel.id } },
+          { returnDocument: "after" }
+        )) as RoleReactionMessageData
+
+        await _message.edit({
+          components: [await createComponent(interaction, updated, _page), createButtons(updated)],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+        })
+      }
+
+      //
+    } else if (interaction.isStringSelectMenu() || interaction.isRoleSelectMenu()) {
+      if (!_channel.isTextBased() || !_channel.isSendable()) return
+      const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
+      const _message = await _channel.messages.fetch(_messageId)
+      // Defer update
+      await interaction.deferUpdate()
+
+      if (_action === "selectemoji" || _action === "selectrole") {
+        const updated =
+          _action === "selectemoji"
+            ? ((await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+                { messageId: _messageId },
+                { $set: { "reactions.$[r].emoji": interaction.values[0] ?? "" } },
+                {
+                  arrayFilters: [{ "r.published": false }],
+                  returnDocument: "after"
+                }
+              )) as RoleReactionMessageData)
+            : ((await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+                { messageId: _messageId },
+                { $set: { "reactions.$[r].role": interaction.values[0] ?? "" } },
+                {
+                  arrayFilters: [{ "r.published": false }],
+                  returnDocument: "after"
+                }
+              )) as RoleReactionMessageData)
+
+        await _message.edit({
+          components: [await createComponent(interaction, updated), createButtons(updated)],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+        })
       }
     }
   }

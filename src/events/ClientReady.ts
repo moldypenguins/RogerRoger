@@ -5,7 +5,7 @@
  **/
 
 import { Guild, GuildMember, ActivityType, Events } from "discord.js"
-import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
+import type { DiscordBot, DiscordEvent, DiscordGuildData, DiscordUserData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild, DiscordUser } from "../databank/index.js"
 
@@ -26,12 +26,11 @@ const ev: DiscordEvent = {
       if (!_guild) return
       _guild.members.cache.each(async (value: GuildMember) => {
         //DiscordUserData
-        let doc = await DiscordUser.findOneAndUpdate({ id: value.user.id }, new DiscordUser(value.user), {
+        let doc = await DiscordUser.findOneAndUpdate<DiscordUserData>({ id: value.user.id }, new DiscordUser(value.user), {
           upsert: true, // create if doesn't exist
-          new: true, // return updated document
+          returnDocument: "after", // return updated document
           setDefaultsOnInsert: true // apply defaults on insert
         })
-        doc.save()
       })
 
       // Ensure log channel populated
@@ -41,12 +40,12 @@ const ev: DiscordEvent = {
       }
       // Admin logging
       const _logchan = client.channels.cache.get(_guilds[_g].logsChannelId)
-      if (_logchan?.isTextBased() && "send" in _logchan) {
+      if (_logchan?.isTextBased() && "send" in _logchan && Config.discord.connected.length > 0) {
         _logchan.send({
           embeds: [
             {
-              color: 0x77dd77,
-              description: Config.discord.activity,
+              color: _guilds[_g].embedColor,
+              description: Config.discord.connected,
               author: {
                 name: `${client.user.displayName} Connected`,
                 icon_url: "https://media.discordapp.net/stickers/1469552270105383065.webp?size=32&quality=lossless"

@@ -22,14 +22,7 @@ import {
 } from "discord.js"
 
 import Config from "../config/index.js"
-import type {
-  DiscordBot,
-  DiscordCommand,
-  DiscordGuildData,
-  DiscordUserData,
-  FoxholeStockpileData,
-  FoxholeTownData
-} from "../types/index.js"
+import type { DiscordBot, DiscordCommand, DiscordGuildData, DiscordUserData, FoxholeStockpileData, FoxholeTownData } from "../types/index.js"
 import { Databank, DiscordGuild, DiscordUser, FoxholeStockpile, FoxholeTown } from "../databank/index.js"
 
 const BuildingEmojiMap = {
@@ -49,12 +42,8 @@ const commandStockpile: DiscordCommand = {
     .setDescription("Create a new stockpile.")
     .setContexts([InteractionContextType.Guild])
     .setDefaultMemberPermissions(PermissionFlagsBits.UseApplicationCommands)
-    .addStringOption((option) =>
-      option.setName("location").setDescription("The stockpile location.").setRequired(true).setAutocomplete(true)
-    )
-    .addStringOption((option) =>
-      option.setName("code").setDescription("The stockpile code.").setRequired(true).setMinLength(6).setMaxLength(6)
-    ),
+    .addStringOption((option) => option.setName("location").setDescription("The stockpile location.").setRequired(true).setAutocomplete(true))
+    .addStringOption((option) => option.setName("code").setDescription("The stockpile code.").setRequired(true).setMinLength(6).setMaxLength(6)),
   async execute(client: DiscordBot, interaction: Interaction): Promise<void> {
     //console.log(`INT: ${util.inspect(interaction, true, 2, true)}`);
     let _guild: DiscordGuildData | null = await DiscordGuild.findOne({ id: interaction.guildId })
@@ -129,14 +118,8 @@ const commandStockpile: DiscordCommand = {
             ],
             components: [
               new ActionRowBuilder<ButtonBuilder>().addComponents(
-                new ButtonBuilder()
-                  .setCustomId(`stockpile_refresh_${_stockpile._id}`)
-                  .setLabel("Refresh")
-                  .setStyle(ButtonStyle.Success),
-                new ButtonBuilder()
-                  .setCustomId(`stockpile_delete_${_stockpile._id}`)
-                  .setLabel("Delete")
-                  .setStyle(ButtonStyle.Danger)
+                new ButtonBuilder().setCustomId(`stockpile_refresh_${_stockpile._id}`).setLabel("Refresh").setStyle(ButtonStyle.Success),
+                new ButtonBuilder().setCustomId(`stockpile_delete_${_stockpile._id}`).setLabel("Delete").setStyle(ButtonStyle.Danger)
               )
             ]
           })
@@ -235,15 +218,9 @@ const commandStockpile: DiscordCommand = {
         } else {
           let _sid = interaction.customId.split("_")[2]
 
-          const yes = new ButtonBuilder()
-            .setCustomId(`stockpile_confirm_yes_${_sid}`)
-            .setLabel("Yes")
-            .setStyle(ButtonStyle.Success)
+          const yes = new ButtonBuilder().setCustomId(`stockpile_confirm_yes_${_sid}`).setLabel("Yes").setStyle(ButtonStyle.Success)
 
-          const no = new ButtonBuilder()
-            .setCustomId(`stockpile_confirm_no_${_sid}`)
-            .setLabel("No")
-            .setStyle(ButtonStyle.Danger)
+          const no = new ButtonBuilder().setCustomId(`stockpile_confirm_no_${_sid}`).setLabel("No").setStyle(ButtonStyle.Danger)
 
           interaction.reply({
             embeds: [

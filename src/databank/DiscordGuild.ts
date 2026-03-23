@@ -36,7 +36,7 @@ const DiscordGuildSchema = new Schema<DiscordGuildData>(
     stockpilesChannelId: { type: String, required: false, default: null },
     logsChannelId: { type: String, required: false, default: null },
     welcomeMessage: { type: String, required: false, default: null },
-    embedColor: { type: Number, required: false, default: null }
+    embedColor: { type: Number, required: false, default: 14406576 }
   },
   {
     timestamps: true

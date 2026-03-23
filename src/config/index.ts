@@ -10,6 +10,6 @@ import localConfig from "../config/local.js"
 export default defu(localConfig, {
   debug: false,
   database: "",
-  discord: { token: "", client_id: "", activity: "" },
+  discord: { token: "", client_id: "", activity: "", connected: "" },
   steam: { api_key: "" }
 })

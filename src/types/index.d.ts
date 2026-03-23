@@ -4,15 +4,7 @@
  * @summary Type definitions
  **/
 
-import type {
-  Client,
-  Guild,
-  User,
-  Interaction,
-  Events,
-  SlashCommandBuilder,
-  SlashCommandSubcommandsOnlyBuilder
-} from "discord.js"
+import type { Client, Guild, User, Interaction, Events, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js"
 import type { Schema } from "mongoose"
 
 /** Interfaces for databank models */
@@ -76,6 +68,30 @@ export interface FoxholeStockpileData {
   updatedAt: Date
 }
 
+/** RoleReactionData subdocument interface */
+export interface RoleReactionData {
+  _id: Schema.Types.ObjectId
+  emojiId: string
+  roleId: string
+  details: string
+  published: boolean
+}
+
+/** RoleReactionMessageData document interface */
+export interface RoleReactionMessageData {
+  _id: Schema.Types.ObjectId
+  guild: Schema.Types.ObjectId
+  title: string
+  description: string
+  color: number
+  reactions: RoleReactionData[]
+  channelId: string
+  editId: string
+  postId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 /** Interface for configuration */
 export type Config = {
   /** Logging */
@@ -87,6 +103,7 @@ export type Config = {
     token: string
     client_id: string
     activity: string
+    connected: string
   }
   /** Steam */
   steam: {

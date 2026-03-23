@@ -4,15 +4,7 @@
  * @summary Setup Commands
  **/
 
-import {
-  Interaction,
-  ChannelType,
-  InteractionContextType,
-  PermissionFlagsBits,
-  MessageFlags,
-  SlashCommandBuilder,
-  channelMention
-} from "discord.js"
+import { Interaction, ChannelType, InteractionContextType, PermissionFlagsBits, MessageFlags, SlashCommandBuilder, channelMention } from "discord.js"
 
 import type { DiscordBot, DiscordCommand } from "../types/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -29,11 +21,7 @@ const commandSetup: DiscordCommand = {
         .setName("logs")
         .setDescription("Set the logs channel.")
         .addChannelOption((option) =>
-          option
-            .setName("channel")
-            .setDescription("The channel to post to.")
-            .setRequired(true)
-            .addChannelTypes(ChannelType.GuildText)
+          option.setName("channel").setDescription("The channel to post to.").setRequired(true).addChannelTypes(ChannelType.GuildText)
         )
     )
     .addSubcommand((subcommand) =>
@@ -41,11 +29,7 @@ const commandSetup: DiscordCommand = {
         .setName("stockpiles")
         .setDescription("Set the stockpiles channel.")
         .addChannelOption((option) =>
-          option
-            .setName("channel")
-            .setDescription("The channel to post to.")
-            .setRequired(true)
-            .addChannelTypes(ChannelType.GuildText)
+          option.setName("channel").setDescription("The channel to post to.").setRequired(true).addChannelTypes(ChannelType.GuildText)
         )
     )
     .addSubcommand((subcommand) =>
@@ -53,17 +37,14 @@ const commandSetup: DiscordCommand = {
         .setName("welcome")
         .setDescription("Set the welcome message.")
         .addStringOption(
-          (option) =>
-            option.setName("message").setDescription("The message to set.").setRequired(true).setMaxLength(2000) //ensure the text will fit in an embed description
+          (option) => option.setName("message").setDescription("The message to set.").setRequired(true).setMaxLength(2000) //ensure the text will fit in an embed description
         )
     )
     .addSubcommand((subcommand) =>
       subcommand
         .setName("color")
         .setDescription("Set the message color.")
-        .addStringOption((option) =>
-          option.setName("color").setDescription("The color to set.").setRequired(true).setMinLength(6).setMaxLength(6)
-        )
+        .addStringOption((option) => option.setName("color").setDescription("The color to set.").setRequired(true).setMinLength(6).setMaxLength(6))
     ),
 
   async execute(client: DiscordBot, interaction: Interaction): Promise<void> {
@@ -86,10 +67,7 @@ const commandSetup: DiscordCommand = {
       case "stockpiles":
         let _stockpileschannel = interaction.options.getChannel("channel")
         if (_stockpileschannel) {
-          await DiscordGuild.updateOne(
-            { id: interaction.guildId },
-            { $set: { stockpilesChannelId: _stockpileschannel.id } }
-          )
+          await DiscordGuild.updateOne({ id: interaction.guildId }, { $set: { stockpilesChannelId: _stockpileschannel.id } })
           interaction.reply({
             content: `Set ${channelMention(_stockpileschannel.id)} as the stockpiles channel.`,
             ephemeral: true

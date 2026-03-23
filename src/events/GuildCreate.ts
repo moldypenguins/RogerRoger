@@ -17,12 +17,11 @@ const ev: DiscordEvent = {
     if (Config.debug) console.log(`Discord: Joined guild ${guild.name} (${guild.id})!`)
 
     //DiscordGuildData
-    let doc = await DiscordGuild.findOneAndUpdate({ id: guild.id }, new DiscordGuild(guild), {
+    let doc = await DiscordGuild.findOneAndUpdate<DiscordGuildData>({ id: guild.id }, new DiscordGuild(guild), {
       upsert: true, // create if doesn't exist
-      new: true, // return updated document
+      returnDocument: "after", // return updated document
       setDefaultsOnInsert: true // apply defaults on insert
     })
-    doc.save()
   }
 }
 

@@ -28,11 +28,7 @@ const ev: DiscordEvent = {
     } else if (oldState.channelId === null && newState.channelId !== null) {
       _message = `${oldState.member.user.tag} joined\n- ${channelMention(newState.channelId)}`
       _color = 0x77dd77
-    } else if (
-      oldState.channelId !== null &&
-      newState.channelId !== null &&
-      newState.channelId !== oldState.channelId
-    ) {
+    } else if (oldState.channelId !== null && newState.channelId !== null && newState.channelId !== oldState.channelId) {
       _message = `${oldState.member.user.tag} moved\n- from ${channelMention(oldState.channelId)}\n- to ${channelMention(newState.channelId)}`
       _color = 0xffb347
     }

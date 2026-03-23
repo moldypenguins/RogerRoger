@@ -9,6 +9,7 @@ import DiscordGuild from "./DiscordGuild.js"
 import DiscordUser from "./DiscordUser.js"
 import FoxholeStockpile from "./FoxholeStockpile.js"
 import FoxholeTown from "./FoxholeTown.js"
+import RoleReaction from "./RoleReaction.js"
 
 import Config from "../config/index.js"
 
@@ -17,4 +18,4 @@ mongoose.connect(Config.database).catch((err) => console.log(err.reason))
 mongoose.connection.on("error", (err) => console.log(err.reason))
 mongoose.connection.once("open", () => console.log("Database loaded."))
 
-export { mongoose as Databank, DiscordGuild, DiscordUser, FoxholeStockpile, FoxholeTown }
+export { mongoose as Databank, DiscordGuild, DiscordUser, FoxholeStockpile, FoxholeTown, RoleReaction }
