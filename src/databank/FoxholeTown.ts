@@ -3,7 +3,6 @@
  * @version 2026-02-06
  * @summary FoxholeTown interface and schema
  **/
-"use strict"
 
 import { model, Schema } from "mongoose"
 import { FoxholeTownData } from "../types/index.js"

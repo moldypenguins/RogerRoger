@@ -3,7 +3,6 @@
  * @version 2026-02-05
  * @summary Discord guild schema
  **/
-"use strict"
 
 import { model, Schema } from "mongoose"
 import { DiscordGuildData } from "../types/index.js"

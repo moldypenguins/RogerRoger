@@ -3,7 +3,6 @@
  * @version 2026-01-13
  * @summary Command handlers
  **/
-"use strict"
 
 import type { DiscordCommand } from "../types/index.js"
 import rolereaction from "./rolereaction.js"

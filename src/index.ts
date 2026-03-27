@@ -4,8 +4,6 @@
  * @summary Main entry point for the bot
  **/
 
-"use strict"
-
 // local imports
 import { Databank } from "./databank/index.js"
 import { DiscordBot } from "./bot.js"

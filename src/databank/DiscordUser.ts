@@ -3,7 +3,6 @@
  * @version 2026-02-05
  * @summary Discord user schema
  **/
-"use strict"
 
 import { model, Schema } from "mongoose"
 import { DiscordUserData } from "../types/index.js"
