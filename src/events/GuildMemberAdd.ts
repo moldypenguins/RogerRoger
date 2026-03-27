@@ -4,7 +4,7 @@
  * @summary Handles guild member add events
  **/
 
-import { Events, GuildMember, userMention } from "discord.js"
+import { Events, GuildMember, userMention, ContainerBuilder, MessageFlags } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -20,16 +20,18 @@ const ev: DiscordEvent = {
     if (!member.user.bot && _guild.welcomeMessage) {
       const _wchan = client.channels.cache.get(_guild.systemChannelId ?? "")
       if (_wchan?.isTextBased() && "send" in _wchan) {
+        const welcomeMessage = _guild.welcomeMessage
+          .replace(/\\n/g, "\n")
+          .replace(/{{user}}/i, `${userMention(member.user.id)}`)
+          .replace(/{{guild}}/i, `${member.guild.name}`)
+
+        const _container = new ContainerBuilder()
+          .setAccentColor(_guild.embedColor)
+          .addTextDisplayComponents((textDisplay) => textDisplay.setContent(welcomeMessage))
+
         _wchan.send({
-          embeds: [
-            {
-              color: _guild.embedColor,
-              description: _guild.welcomeMessage
-                .replace(/\\n/g, "\n")
-                .replace(/{{user}}/i, `${userMention(member.user.id)}`)
-                .replace(/{{guild}}/i, `${member.guild.name}`)
-            }
-          ]
+          components: [_container],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
         })
       }
     }
@@ -42,17 +44,13 @@ const ev: DiscordEvent = {
     // Admin logging
     const _logchan = client.channels.cache.get(_guild.logsChannelId)
     if (_logchan?.isTextBased() && "send" in _logchan) {
+      const _container = new ContainerBuilder()
+        .setAccentColor(0x77dd77)
+        .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### Member Joined\n- ${member.user.tag}`))
+
       _logchan.send({
-        embeds: [
-          {
-            color: 0x77dd77,
-            description: `${member.user.tag} joined the server.`,
-            author: {
-              name: "Guild Member Add",
-              icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

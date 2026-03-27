@@ -35,13 +35,20 @@ let RoleReactionMessageSchema = new Schema<RoleReactionMessageData>(
 )
 
 /**
- * Enforce that messageId is unique ONLY when it is present and non-empty.
+ * Enforce that editId/postId are unique ONLY when present and non-empty.
  */
 RoleReactionMessageSchema.index(
-  { messageId: 1 },
+  { editId: 1 },
   {
     unique: true,
-    partialFilterExpression: { messageId: { $type: "string", $ne: "" } }
+    partialFilterExpression: { editId: { $type: "string", $ne: "" } }
+  }
+)
+RoleReactionMessageSchema.index(
+  { postId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { postId: { $type: "string", $ne: "" } }
   }
 )
 

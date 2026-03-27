@@ -4,7 +4,7 @@
  * @summary Handles guild member remove events
  **/
 
-import { Events, GuildMember } from "discord.js"
+import { Events, GuildMember, ContainerBuilder, MessageFlags } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -25,17 +25,13 @@ const ev: DiscordEvent = {
     // Admin logging
     const _logchan = client.channels.cache.get(_guild.logsChannelId)
     if (_logchan?.isTextBased() && "send" in _logchan) {
+      const _container = new ContainerBuilder()
+        .setAccentColor(0x77dd77)
+        .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### Member Left\n- ${member.user.tag}`))
+
       _logchan.send({
-        embeds: [
-          {
-            color: 0x77dd77,
-            description: `${member.user.tag} left the server.`,
-            author: {
-              name: "Guild Member Remove",
-              icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

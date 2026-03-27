@@ -4,7 +4,7 @@
  * @summary Handles user ban events
  **/
 
-import { Events, GuildBan } from "discord.js"
+import { Events, GuildBan, ContainerBuilder, MessageFlags } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -28,17 +28,15 @@ const ev: DiscordEvent = {
     if (_logchan?.isTextBased() && "send" in _logchan) {
       const reason = ban.reason || "*No reason provided*"
 
+      const _container = new ContainerBuilder()
+        .setAccentColor(0xff6961)
+        .addTextDisplayComponents((textDisplay) =>
+          textDisplay.setContent(`### User Banned\n- **User:** ${ban.user.tag} (${ban.user.id})\n- **Reason:** ${reason}`)
+        )
+
       _logchan.send({
-        embeds: [
-          {
-            color: 0xff6961,
-            description: `**User banned**\n**User:** ${ban.user.tag} (${ban.user.id})\n**Reason:** ${reason}`,
-            author: {
-              name: "Guild Ban Add",
-              icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

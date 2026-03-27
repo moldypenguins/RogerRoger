@@ -103,7 +103,7 @@ export type Config = {
     token: string
     client_id: string
     activity: string
-    connected: string
+    connected: boolean
   }
   /** Steam */
   steam: {

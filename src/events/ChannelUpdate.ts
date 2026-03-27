@@ -4,7 +4,7 @@
  * @summary Handles channel update events
  **/
 
-import { Events, GuildChannel } from "discord.js"
+import { Events, GuildChannel, ContainerBuilder, MessageFlags } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -43,17 +43,14 @@ const ev: DiscordEvent = {
     // Admin logging
     const _logchan = client.channels.cache.get(_guild.logsChannelId)
     if (_logchan?.isTextBased() && "send" in _logchan) {
+      const changeLines = changes.map((change) => `- ${change}`).join("\n")
+      const _container = new ContainerBuilder()
+        .setAccentColor(0xffb347)
+        .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### Channel Updated\n- **Channel:** <#${newChannel.id}>\n${changeLines}`))
+
       _logchan.send({
-        embeds: [
-          {
-            color: 0xffb347,
-            description: `**Channel updated**\n**Channel:** <#${newChannel.id}>\n${changes.join("\n")}`,
-            author: {
-              name: "Channel Update",
-              icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

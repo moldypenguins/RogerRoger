@@ -11,6 +11,7 @@ import { APIApplicationCommand, Client, GatewayIntentBits, REST, Routes } from "
 import Config from "./config/index.js"
 import DiscordEvents from "./events/index.js"
 import DiscordCommands from "./commands/index.js"
+import { extractGuildId, reportDiscordError } from "./error.js"
 
 /** Extended discord.js Client with command and event handling */
 export class DiscordBot extends Client {
@@ -54,6 +55,9 @@ export class DiscordBot extends Client {
           body: botCommands
         })) as APIApplicationCommand[]
         console.log(`Reloaded ${data.length} discord commands.`)
+
+        this.shutdown()
+        //TODO: add event to signal process.exit
       } catch (err) {
         console.error(err)
       }
@@ -62,15 +66,46 @@ export class DiscordBot extends Client {
 
   /** Logs in the bot with the provided token */
   public async start(): Promise<void> {
+    /** Register error handlers */
+    this.on("error", (err) => {
+      console.error("Discord client error:", err)
+    })
+
+    this.on("shardError", (err) => {
+      console.error("Discord shard error:", err)
+    })
+
+    this.on("warn", (msg) => {
+      if (Config.debug) console.warn("Discord client warn:", msg)
+    })
+
     /** Register event handlers */
     console.log("Registering event handlers...")
     Object.values(DiscordEvents).forEach((event) => {
       if (event.once) {
         if (Config.debug) console.log(`Registered Event: Once ${event.name.toString()}`)
-        this.once(event.name as string, (...args) => event.execute(this, ...args))
+        this.once(event.name as string, async (...args) => {
+          try {
+            await event.execute(this, ...args)
+          } catch (err) {
+            await reportDiscordError(this, err, {
+              source: `event:${event.name.toString()}`,
+              guildId: extractGuildId(args)
+            })
+          }
+        })
       } else {
         if (Config.debug) console.log(`Registered Event: On ${event.name.toString()}`)
-        this.on(event.name as string, (...args) => event.execute(this, ...args))
+        this.on(event.name as string, async (...args) => {
+          try {
+            await event.execute(this, ...args)
+          } catch (err) {
+            await reportDiscordError(this, err, {
+              source: `event:${event.name.toString()}`,
+              guildId: extractGuildId(args)
+            })
+          }
+        })
       }
     })
 

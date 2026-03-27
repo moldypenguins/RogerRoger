@@ -4,7 +4,7 @@
  * @summary Handles voice state update events
  **/
 
-import { Events, VoiceState, channelMention } from "discord.js"
+import { Events, VoiceState, channelMention, ContainerBuilder, MessageFlags } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -41,17 +41,13 @@ const ev: DiscordEvent = {
     // Admin logging
     const _chan = client.channels.cache.get(_guild.logsChannelId)
     if (_chan?.isTextBased() && "send" in _chan && _message && _color) {
+      const _container = new ContainerBuilder()
+        .setAccentColor(_color)
+        .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### Voice State Update\n${_message}`))
+
       _chan?.send({
-        embeds: [
-          {
-            color: _color,
-            description: _message,
-            author: {
-              name: "Voice State Update",
-              icon_url: "https://media.discordapp.net/stickers/1469496572998848657.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

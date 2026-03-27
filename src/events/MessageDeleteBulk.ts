@@ -4,7 +4,7 @@
  * @summary Handles bulk message deletion events
  **/
 
-import { Collection, Events, Message, Snowflake } from "discord.js"
+import { Collection, Events, Message, Snowflake, ContainerBuilder, MessageFlags } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -31,17 +31,15 @@ const ev: DiscordEvent = {
     if (_logchan?.isTextBased() && "send" in _logchan) {
       const channel = firstMessage.channel ? `<#${firstMessage.channel.id}>` : "*[Channel unknown]*"
 
+      const _container = new ContainerBuilder()
+        .setAccentColor(0xff6961)
+        .addTextDisplayComponents((textDisplay) =>
+          textDisplay.setContent(`### Bulk Messages Deleted\n- **Count:** ${messages.size}\n- **Channel:** ${channel}`)
+        )
+
       _logchan.send({
-        embeds: [
-          {
-            color: 0xff6961,
-            description: `**${messages.size} messages bulk deleted in ${channel}**`,
-            author: {
-              name: "Message Bulk Delete",
-              icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

@@ -4,7 +4,7 @@
  * @summary Handles channel creation events
  **/
 
-import { ChannelType, Events, GuildChannel } from "discord.js"
+import { ChannelType, Events, GuildChannel, ContainerBuilder, MessageFlags, GuildEmoji } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -41,17 +41,19 @@ const ev: DiscordEvent = {
           break
       }
 
-      _logchan.send({
-        embeds: [
-          {
-            color: 0x77dd77,
-            description: `**Channel created**\n**Type:** ${channelType}\n**Channel:** <#${channel.id}>`,
-            author: {
-              name: "Channel Create",
-              icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+      const _emoji = channel.guild.emojis.cache.find((e) => e.name === channelType.toLowerCase()) as GuildEmoji
+      const _container = new ContainerBuilder().setAccentColor(_guild.embedColor)
+
+      if (channel.type === ChannelType.GuildCategory) {
+        _container.addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### ${_emoji.toString()} Category Created`))
+      } else {
+        _container.addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### ${_emoji.toString()} ${channelType} Channel Created`))
+      }
+      _container.addTextDisplayComponents((textDisplay) => textDisplay.setContent(`- ${channel.name} <${channel.id}>`))
+
+      await _logchan.send({
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

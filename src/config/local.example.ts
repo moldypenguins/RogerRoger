@@ -13,7 +13,7 @@ const localConfig: Config = {
     token: "YOUR_DISCORD_BOT_TOKEN_HERE", // 72 character Discord bot token
     client_id: "YOUR_DISCORD_CLIENT_ID",
     activity: "YOUR_DISCORD_BOT_ACTIVITY",
-    connected: "YOUR_DISCORD_BOT_CONNECT_MESSAGE"
+    connected: true
   },
   steam: {
     api_key: "YOUR_STEAM_API_KEY"

@@ -4,7 +4,7 @@
  * @summary Handles channel deletion events
  **/
 
-import { ChannelType, Events, GuildChannel } from "discord.js"
+import { ChannelType, Events, GuildChannel, ContainerBuilder, MessageFlags } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -41,17 +41,15 @@ const ev: DiscordEvent = {
           break
       }
 
+      const _container = new ContainerBuilder()
+        .setAccentColor(0xff6961)
+        .addTextDisplayComponents((textDisplay) =>
+          textDisplay.setContent(`### Channel Deleted\n- **Name:** ${channel.name}\n- **Type:** ${channelType}\n- **ID:** ${channel.id}`)
+        )
+
       _logchan.send({
-        embeds: [
-          {
-            color: 0xff6961,
-            description: `**Channel deleted**\n**Name:** ${channel.name}\n**Type:** ${channelType}\n**ID:** ${channel.id}`,
-            author: {
-              name: "Channel Delete",
-              icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

@@ -4,7 +4,7 @@
  * @summary Handles guild member update events
  **/
 
-import { Events, GuildMember, roleMention } from "discord.js"
+import { Events, GuildMember, roleMention, ContainerBuilder, MessageFlags } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -45,17 +45,14 @@ const ev: DiscordEvent = {
     // Admin logging
     const _logchan = client.channels.cache.get(_guild.logsChannelId)
     if (_logchan?.isTextBased() && "send" in _logchan) {
+      const replyLines = _reply.length > 0 ? _reply.map((line) => `- ${line}`).join("\n") : "- *No changes detected*"
+      const _container = new ContainerBuilder()
+        .setAccentColor(0x77dd77)
+        .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### Member Updated\n${replyLines}`))
+
       _logchan.send({
-        embeds: [
-          {
-            color: 0x77dd77,
-            description: _reply.join("\n"),
-            author: {
-              name: "Guild Member Update",
-              icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

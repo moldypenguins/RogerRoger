@@ -4,7 +4,7 @@
  * @summary Handles message edit events
  **/
 
-import { Events, Message } from "discord.js"
+import { Events, Message, ContainerBuilder, MessageFlags } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild } from "../databank/index.js"
@@ -37,17 +37,17 @@ const ev: DiscordEvent = {
       const author = newMessage.author ? `${newMessage.author.tag} (${newMessage.author.id})` : "*[Author unknown]*"
       const channel = newMessage.channel ? `<#${newMessage.channel.id}>` : "*[Channel unknown]*"
 
+      const _container = new ContainerBuilder()
+        .setAccentColor(0xffb347)
+        .addTextDisplayComponents((textDisplay) =>
+          textDisplay.setContent(
+            `### Message Edited\n- **Channel:** ${channel}\n- **Author:** ${author}\n- **Before:** ${oldContent}\n- **After:** ${newContent}`
+          )
+        )
+
       _logchan.send({
-        embeds: [
-          {
-            color: 0xffb347,
-            description: `**Message edited in ${channel}**\n**Author:** ${author}\n**Before:** ${oldContent}\n**After:** ${newContent}`,
-            author: {
-              name: "Message Update",
-              icon_url: "https://media.discordapp.net/stickers/1469518684040200305.webp?size=32&quality=lossless"
-            }
-          }
-        ]
+        components: [_container],
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
       })
     }
   }

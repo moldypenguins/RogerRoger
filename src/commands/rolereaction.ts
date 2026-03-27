@@ -4,76 +4,173 @@
  * @version 2026-02-19
  */
 
-import util from "node:util"
+//import util from "node:util"
 
 import {
-  APISelectMenuOption,
-  APIRole,
   ModalBuilder,
   ContainerBuilder,
-  ContainerComponent,
   SlashCommandBuilder,
   SeparatorSpacingSize,
-  ActionRow,
-  MessageActionRowComponent,
-  Guild,
+  MessageEditOptions,
   GuildMemberRoleManager,
   GuildEmoji,
-  Role,
   Interaction,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   ChannelSelectMenuBuilder,
-  Channel,
+  TextChannel,
   InteractionContextType,
   StringSelectMenuBuilder,
   PermissionFlagsBits,
   RoleSelectMenuBuilder,
   roleMention,
   MessageFlags,
-  TextBasedChannel,
   TextInputBuilder,
   TextInputStyle,
   StringSelectMenuOptionBuilder,
-  Component,
-  ComponentType,
-  TextDisplayComponent,
-  SectionComponent,
-  LabelBuilder,
-  ButtonComponent,
-  RoleSelectMenuComponent,
-  StringSelectMenuComponent,
   ChannelType,
-  TextDisplayComponentData
+  Message
 } from "discord.js"
 
 // local imports
 import Config from "../config/index.js"
 import type { DiscordBot, DiscordCommand, DiscordGuildData, RoleReactionMessageData, RoleReactionData } from "../types/index.js"
 import { Databank, DiscordGuild, RoleReaction } from "../databank/index.js"
-import { isSnowflake } from "../utils.js"
-
-const IDS = {
-  LOADING: 412565817,
-  CONTAINER: 555798250,
-  ROLEREACTIONS: 303777619,
-  SECTION: 933374421,
-  DETAILS: 897811392
-}
+import { isSnowflake, LoadingContainer } from "../utils.js"
 
 const EMOJISPERPAGE = 24
 
-const createLoading = (color: number, title: string, description: string) => {
-  return new ContainerBuilder()
-    .setId(IDS.LOADING)
-    .setAccentColor(color)
-    .addTextDisplayComponents(
-      (textDisplay) => textDisplay.setContent(`# ${title}`),
-      (textDisplay) => textDisplay.setContent(`***${description.replace(/\\n/g, "\n")}***`)
+const buildDraftPayload = async (interaction: Interaction, document: RoleReactionMessageData, page?: string) => {
+  return {
+    components: [await createComponent(interaction, document, page), createButtons(document)],
+    flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+  }
+}
+
+const buildPostedPayload = async (interaction: Interaction, document: RoleReactionMessageData, messageId: string) => {
+  return {
+    components: [await createComponent(interaction, document), createReactions(document, messageId)],
+    flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
+  }
+}
+
+type UpdateableInteraction = Interaction & { update: (options: MessageEditOptions) => Promise<unknown> }
+
+const isUpdateableInteraction = (interaction: Interaction): interaction is UpdateableInteraction => {
+  return "update" in interaction && typeof (interaction as { update?: unknown }).update === "function"
+}
+
+class RoleReactionOps {
+  constructor(
+    private client: DiscordBot,
+    private interaction: Interaction,
+    private channel: TextChannel,
+    private guildData: DiscordGuildData
+  ) {}
+
+  parseCustomId(customId: string) {
+    const [, action, messageId, data = undefined] = customId.split("_")
+    return { action, messageId, data }
+  }
+
+  async fetchMessage(messageId: string): Promise<Message | null> {
+    if (!this.interaction.channel || !this.interaction.channel.isTextBased()) return null
+    try {
+      return await this.interaction.channel.messages.fetch(messageId)
+    } catch {
+      return null
+    }
+  }
+
+  async getDraft(messageId: string) {
+    return RoleReaction.findOne<RoleReactionMessageData>({ editId: messageId })
+  }
+
+  async editDraftMessage(message: Message, document: RoleReactionMessageData, page?: string): Promise<void> {
+    await message.edit(await buildDraftPayload(this.interaction, document, page))
+  }
+
+  async updateInteractionDraft(document: RoleReactionMessageData, page?: string): Promise<void> {
+    if (!isUpdateableInteraction(this.interaction)) return
+    await this.interaction.update(await buildDraftPayload(this.interaction, document, page))
+  }
+
+  async updateDraftReactionField(messageId: string, field: "emojiId" | "roleId", value: string) {
+    return RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+      { editId: messageId },
+      { $set: { [`reactions.$[r].${field}`]: value } },
+      {
+        arrayFilters: [{ "r.published": false }],
+        returnDocument: "after"
+      }
     )
-    .addSeparatorComponents((separator) => separator.setDivider(false).setSpacing(SeparatorSpacingSize.Large))
-    .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Loading..."))
+  }
+
+  async updateDraftDetails(messageId: string, reactionId: string, details: string) {
+    return RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+      { editId: messageId },
+      { $set: { "reactions.$[r].details": details } },
+      {
+        arrayFilters: [{ "r._id": reactionId }],
+        returnDocument: "after"
+      }
+    )
+  }
+
+  async updateDraftChannel(messageId: string, channelId: string) {
+    return RoleReaction.findOneAndUpdate<RoleReactionMessageData>({ editId: messageId }, { $set: { channelId } }, { returnDocument: "after" })
+  }
+
+  async setDraftPublished(messageId: string) {
+    await RoleReaction.updateOne({ editId: messageId }, { $set: { "reactions.$[r].published": true } }, { arrayFilters: [{ "r.published": false }] })
+    return RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+      { editId: messageId },
+      { $push: { reactions: { _id: new Databank.Types.ObjectId() } } },
+      { returnDocument: "after" }
+    )
+  }
+
+  async removeDraftReaction(messageId: string, reactionId: string) {
+    await RoleReaction.updateOne({ editId: messageId }, { $pull: { reactions: { _id: reactionId } } })
+  }
+
+  async postMessage(document: RoleReactionMessageData): Promise<{ posted: Message; updated: RoleReactionMessageData }> {
+    const target = this.client.channels.cache.get(document.channelId)
+    if (!target || !target.isTextBased() || !target.isSendable()) {
+      throw new Error("Target channel is not sendable for role reaction post.")
+    }
+
+    const posted = await target.send({
+      components: [LoadingContainer(document.color, document.title, document.description)],
+      flags: MessageFlags.IsComponentsV2 | MessageFlags.Loading
+    })
+
+    const updated = await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
+      { editId: document.editId },
+      { $set: { editId: "", postId: posted.id } },
+      { returnDocument: "after" }
+    )
+
+    if (!updated) {
+      throw new Error("Failed to update role reaction post record.")
+    }
+
+    await posted.edit(await buildPostedPayload(this.interaction, updated, document.editId))
+
+    return { posted, updated }
+  }
+
+  async sendPostConfirmation(channelId: string) {
+    await this.channel.send({
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(this.guildData.embedColor)
+          .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### Role Reaction message posted in <#${channelId}>`))
+      ],
+      flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+    })
+  }
 }
 
 /**
@@ -87,14 +184,13 @@ const createComponent = async (interaction: Interaction, document: RoleReactionM
   const _reaction: RoleReactionData = document.reactions.find((r) => r.published === false) as RoleReactionData
 
   const _container = new ContainerBuilder()
-    .setId(IDS.CONTAINER)
     .setAccentColor(document.color)
     .addTextDisplayComponents(
       (textDisplay) => textDisplay.setContent(`# ${document.title}`),
       (textDisplay) => textDisplay.setContent(`***${document.description.replace(/\\n/g, "\n")}***`)
     )
     .addSeparatorComponents((separator) => separator.setSpacing(SeparatorSpacingSize.Large))
-    .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Role Reactions:").setId(IDS.ROLEREACTIONS))
+    .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Role Reactions:"))
 
   const _published: RoleReactionData[] = document.reactions.filter((m) => m.published === true)
   if (_published.length > 0) {
@@ -186,9 +282,7 @@ const createComponent = async (interaction: Interaction, document: RoleReactionM
       .addTextDisplayComponents((textDisplay) => textDisplay.setContent("### Details:"))
       .addSectionComponents((section) =>
         section
-          .addTextDisplayComponents((textDisplay) =>
-            textDisplay.setContent(_reaction.details.length > 0 ? `> ### ${_reaction.details}` : "> ").setId(IDS.DETAILS)
-          )
+          .addTextDisplayComponents((textDisplay) => textDisplay.setContent(_reaction.details.length > 0 ? `> ### ${_reaction.details}` : "> "))
           .setButtonAccessory((button) =>
             button.setCustomId(`rolereaction_editdetails_${document.editId}_${pagenum}`).setLabel("𝗘𝗗𝗜𝗧 ✎").setStyle(ButtonStyle.Secondary)
           )
@@ -226,10 +320,13 @@ const createButtons = (document: RoleReactionMessageData) => {
 /**
  * Creates an action row for reaction buttons
  */
-const createReactions = (document: RoleReactionMessageData) => {
-  return new ActionRowBuilder<ButtonBuilder>({
-    components: [new ButtonBuilder().setCustomId(`rolereaction_post_${document.editId}`).setLabel("Post").setStyle(ButtonStyle.Secondary)]
-  })
+const createReactions = (document: RoleReactionMessageData, messageId: string) => {
+  const _reactions: RoleReactionData[] = document.reactions.filter((m) => m.published === true)
+  var _row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>({ components: [] })
+  for (const _r of _reactions) {
+    _row.addComponents([new ButtonBuilder().setCustomId(`rolereaction_react_${messageId}_${_r.roleId}`).setEmoji(_r.emojiId).setStyle(ButtonStyle.Secondary)])
+  }
+  return _row
 }
 
 /**
@@ -255,22 +352,28 @@ const commandRoleReaction: DiscordCommand = {
       subcommand
         .setName("update")
         .setDescription("Update an existing role reaction message.")
-        .addStringOption((option) => option.setName("messageId").setDescription("The message id.").setRequired(true).setMaxLength(64))
+        .addStringOption((option) => option.setName("messageid").setDescription("The message id.").setRequired(true).setMaxLength(64))
     )
     .addSubcommand((subcommand) =>
       subcommand
         .setName("delete")
         .setDescription("Delete an existing role reaction message.")
-        .addStringOption((option) => option.setName("messageId").setDescription("The message id.").setRequired(true).setMaxLength(64))
+        .addStringOption((option) => option.setName("messageid").setDescription("The message id.").setRequired(true).setMaxLength(64))
     )
     .addSubcommand((subcommand) => subcommand.setName("list").setDescription("List all existing role reaction messages.")),
 
   async execute(client: DiscordBot, interaction: Interaction): Promise<void> {
+    // Require guild
     if (!interaction.guild) return
 
     const _guild = (await DiscordGuild.findOne({ id: interaction.guild.id })) as DiscordGuildData
-    const _chan = interaction.channel as TextBasedChannel
-    const _channel = client.channels.cache.get(_chan.id) as Channel
+    const _chan = interaction.channel as TextChannel
+    //const _channel = client.channels.cache.get(_chan.id) as Channel
+
+    // Require a text based and sendable channel
+    if (!_chan.isTextBased() || !_chan.isSendable()) return
+
+    const ops = new RoleReactionOps(client, interaction, _chan, _guild)
 
     if (interaction.isChatInputCommand()) {
       const _subcommand = interaction.options.getSubcommand()
@@ -284,7 +387,7 @@ const commandRoleReaction: DiscordCommand = {
 
           // Send discord reply
           await interaction.reply({
-            components: [createLoading(m_color, m_title, m_description)],
+            components: [LoadingContainer(m_color, m_title, m_description)],
             flags: MessageFlags.IsComponentsV2 | MessageFlags.Loading
           })
           const reply = await interaction.fetchReply()
@@ -297,46 +400,94 @@ const commandRoleReaction: DiscordCommand = {
             description: m_description,
             color: m_color,
             reactions: [{ _id: new Databank.Types.ObjectId() }],
-            messageId: reply.id
+            editId: reply.id,
+            postId: ""
           }).save()
 
           // Update reply with created container component and buttons
-          await reply.edit({
-            components: [await createComponent(interaction, c_doc), createButtons(c_doc)],
-            flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-          })
+          await reply.edit(await buildDraftPayload(interaction, c_doc))
 
           break
         case "update":
-          const m_messageId = interaction.options.getString("messageId") as string
+          const u_messageId = interaction.options.getString("messageid") as string
 
           // retrieve document
-          const u_doc = await RoleReaction.findOne({ messageId: m_messageId })
+          const u_doc = await RoleReaction.findOne<RoleReactionMessageData>({ postId: u_messageId })
           if (!u_doc) return
 
           // Reply with created container component and buttons
-          await interaction.reply({
-            components: [await createComponent(interaction, u_doc), createButtons(u_doc)],
-            flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-          })
+          await interaction.reply(await buildDraftPayload(interaction, u_doc))
 
           break
         case "delete":
+          const d_messageId = interaction.options.getString("messageid") as string
+
+          // delete document
+          await RoleReaction.deleteOne({ postId: d_messageId })
+          //delete message
+          await _chan.messages.delete(d_messageId)
+
+          await interaction.reply({
+            components: [
+              new ContainerBuilder()
+                .setAccentColor(_guild.embedColor)
+                .addTextDisplayComponents((textDisplay) => textDisplay.setContent("Role reaction deleted."))
+            ],
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+          })
+
           break
         case "list":
+          const l_docs = await RoleReaction.find<RoleReactionMessageData>({
+            postId: { $exists: true, $nin: [null, ""] }
+          })
+
+          await interaction.reply({
+            components: [
+              new ContainerBuilder()
+                .setAccentColor(_guild.embedColor)
+                .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`Role reactions:\n${l_docs.map((d) => d.postId).join("\n")}`))
+            ],
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+          })
+
           break
       }
     } else if (interaction.isButton()) {
-      // Require a text based channel
-      if (!_channel.isTextBased() || !_channel.isSendable()) return
       // Get interaction params
-      const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
-      if (Config.debug) console.log(`Button pressed: ${_action}`)
+      const { action: _action, messageId: _messageId, data: _data } = ops.parseCustomId(interaction.customId)
 
-      const _pagenum: number = parseInt(_page ?? "0", 10)
-      const _message = await _channel.messages.fetch(_messageId)
+      if (Config.debug) console.log(`VARS: ${_action}, ${_messageId}, ${_data ?? "null"}`)
 
-      const currentDoc = await RoleReaction.findOne<RoleReactionMessageData>({ messageId: _messageId })
+      const draftOnlyActions = new Set(["nextemoji", "prevemoji", "post", "cancel", "editdetails", "add"])
+
+      if (_action === "react") {
+        if (!interaction.member || !_data) return
+
+        const roles = interaction.member.roles as GuildMemberRoleManager
+        const hasRole = roles.cache.has(`${_data}`)
+
+        if (hasRole) {
+          await roles.remove(`${_data}`)
+        } else {
+          await roles.add(`${_data}`)
+        }
+
+        await interaction.reply({
+          components: [
+            new ContainerBuilder()
+              .setAccentColor(_guild.embedColor)
+              .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`# Role ${hasRole ? "Removed" : "Added"}\n` + roleMention(`${_data}`)))
+          ],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+        })
+
+        return
+      }
+
+      if (!draftOnlyActions.has(_action)) return
+
+      const currentDoc = await ops.getDraft(_messageId)
       if (!currentDoc) return
 
       const _reaction: RoleReactionData | undefined = currentDoc.reactions.find((r) => r.published === false)
@@ -344,85 +495,47 @@ const commandRoleReaction: DiscordCommand = {
       const emojis = Array.from(interaction.guild.emojis.cache.values())
       const totalPages = Math.ceil(emojis.length / EMOJISPERPAGE)
 
-      if (_action === "nextemoji" && _pagenum < totalPages) {
-        await interaction.update({
-          components: [await createComponent(interaction, currentDoc, `${_pagenum + 1}`), createButtons(currentDoc)],
-          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-        })
-      } else if (_action === "prevemoji" && _pagenum > 0) {
-        await interaction.update({
-          components: [await createComponent(interaction, currentDoc, `${_pagenum - 1}`), createButtons(currentDoc)],
-          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-        })
+      if (_action === "nextemoji" || _action === "prevemoji") {
+        const _pagenum: number = parseInt(_data ?? "0", 10)
+
+        if (_action === "nextemoji" && _pagenum < totalPages) {
+          await ops.updateInteractionDraft(currentDoc, `${_pagenum + 1}`)
+        } else if (_action === "prevemoji" && _pagenum > 0) {
+          await ops.updateInteractionDraft(currentDoc, `${_pagenum - 1}`)
+        }
       } else if (_action === "post") {
+        const _message = await ops.fetchMessage(_messageId)
+        if (!_message) return
+
         await interaction.deferUpdate()
 
         // Delete the edit message
         await _message.delete()
 
         // Remove unpublished role reaction
-        if (_reaction)
-          await RoleReaction.updateOne({ messageId: _messageId }, { $set: { "reactions.$[r]": undefined } }, { arrayFilters: [{ "r._id": _reaction._id }] })
+        if (_reaction) {
+          await ops.removeDraftReaction(_messageId, `${_reaction._id}`)
+        }
 
-        // Get target channel
-        const _target = client.channels.cache.get(currentDoc.channelId)
-        if (!_target || !_target.isTextBased() || !_target.isSendable()) return
-
-        // Post to target channel
-        const _post = await _target.send({
-          components: [createLoading(currentDoc.color, currentDoc.title, currentDoc.description)],
-          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-        })
-
-        // Update record
-        const updated = await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
-          { messageId: _messageId },
-          { $set: { editId: "", postId: _post.id } },
-          { returnDocument: "after" }
-        )
-        if (!updated) return
-
-        // Send confirmation to user
-        await _channel.send({
-          components: [
-            new ContainerBuilder()
-              .setId(IDS.CONTAINER)
-              .setAccentColor(_guild.embedColor)
-              .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### Role Reaction message posted in <#${_target.id}>`))
-          ],
-          flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
-        })
+        try {
+          const postResult = await ops.postMessage(currentDoc)
+          await ops.sendPostConfirmation(postResult.posted.channelId)
+        } catch {
+          return
+        }
       } else if (_action === "cancel") {
+        const _message = await ops.fetchMessage(_messageId)
+        if (!_message) return
+        //TODO: fix this
+
         // Delete from database
-        await RoleReaction.deleteOne({ messageId: _messageId })
+        await RoleReaction.deleteOne({ editId: _messageId })
         // delete from discord
-        const message = await _channel.messages.fetch(interaction.message.id)
+        const message = await _chan.messages.fetch(interaction.message.id)
         await message.delete()
 
         // Delete the edit message
         await _message.delete()
-      } else if (_action === "react" && _reaction) {
-        if (!interaction.member) return
-
-        const roles = interaction.member.roles as GuildMemberRoleManager
-        const hasRole = roles.cache.has(`${_reaction._id}`)
-
-        if (hasRole) {
-          await roles.remove(`${_reaction._id}`)
-        } else {
-          await roles.add(`${_reaction._id}`)
-        }
-
-        await interaction.reply({
-          embeds: [
-            {
-              color: _guild.embedColor,
-              title: `Role ${hasRole ? "Removed" : "Added"}`,
-              description: roleMention(`${_reaction._id}`)
-            }
-          ],
-          ephemeral: true
-        })
       } else if (_action === "editdetails" && _reaction) {
         const modal = new ModalBuilder().setCustomId(`rolereaction_savedetails_${interaction.message.id}`).setTitle("Add Details")
         modal.components.push(
@@ -432,107 +545,62 @@ const commandRoleReaction: DiscordCommand = {
         )
         await interaction.showModal(modal)
       } else if (_action === "add") {
-        await RoleReaction.updateOne({ messageId: _messageId }, { $set: { "reactions.$[r].published": true } }, { arrayFilters: [{ "r.published": false }] })
-
-        const updated = await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
-          { messageId: _messageId },
-          { $push: { reactions: { _id: new Databank.Types.ObjectId() } } },
-          { returnDocument: "after" }
-        )
+        const updated = await ops.setDraftPublished(_messageId)
         if (!updated) return
 
-        const _message = await _channel.messages.fetch(_messageId)
-        await _message.edit({
-          components: [await createComponent(interaction, updated), createButtons(updated)],
-          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-        })
+        const _message = await ops.fetchMessage(_messageId)
+        if (!_message) return
+        await ops.editDraftMessage(_message, updated)
       }
     } else if (interaction.isModalSubmit()) {
-      // Require a text based channel
-      if (!_channel.isTextBased() || !_channel.isSendable()) return
       // Get interaction params
-      const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
-      const _message = await _channel.messages.fetch(_messageId)
+      const { action: _action, messageId: _messageId } = ops.parseCustomId(interaction.customId)
+      const _message = await ops.fetchMessage(_messageId)
+      if (!_message) return
 
       await interaction.deferUpdate()
 
-      const currentDoc = await RoleReaction.findOne<RoleReactionMessageData>({ messageId: _messageId })
+      const currentDoc = await ops.getDraft(_messageId)
       if (!currentDoc) return
       const _reaction: RoleReactionData | undefined = currentDoc.reactions.find((r) => r.published === false)
 
       if (_action == "savedetails" && _reaction) {
         const _details = interaction.fields.getTextInputValue("details") ?? ""
-        const updated = (await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
-          { messageId: _messageId },
-          { $set: { "reactions.$[r].details": _details } },
-          {
-            arrayFilters: [{ "r._id": _reaction._id }],
-            returnDocument: "after"
-          }
-        )) as RoleReactionMessageData
-        await _message.edit({
-          components: [await createComponent(interaction, updated), createButtons(updated)],
-          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-        })
+        const updated = (await ops.updateDraftDetails(_messageId, `${_reaction._id}`, _details)) as RoleReactionMessageData
+        await ops.editDraftMessage(_message, updated)
       }
     } else if (interaction.isChannelSelectMenu()) {
-      // Require a text based channel
-      if (!_channel.isTextBased() || !_channel.isSendable()) return
-
       await interaction.deferUpdate()
 
       // Get interaction params
-      const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
-      const _message = await _channel.messages.fetch(_messageId)
+      const { action: _action, messageId: _messageId, data: _page } = ops.parseCustomId(interaction.customId)
+      const _message = await ops.fetchMessage(_messageId)
+      if (!_message) return
 
       if (_action === "selectchannel") {
         const targetChannel = client.channels.cache.get(interaction.values[0] ?? "")
         if (!targetChannel || !targetChannel.isTextBased() || !targetChannel.isSendable()) return
 
-        const updated = (await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
-          { messageId: _messageId },
-          { $set: { channelId: targetChannel.id } },
-          { returnDocument: "after" }
-        )) as RoleReactionMessageData
+        const updated = (await ops.updateDraftChannel(_messageId, targetChannel.id)) as RoleReactionMessageData
 
-        await _message.edit({
-          components: [await createComponent(interaction, updated, _page), createButtons(updated)],
-          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-        })
+        await ops.editDraftMessage(_message, updated, _page)
       }
 
       //
     } else if (interaction.isStringSelectMenu() || interaction.isRoleSelectMenu()) {
-      if (!_channel.isTextBased() || !_channel.isSendable()) return
-      const [, _action, _messageId, _page = undefined] = interaction.customId.split("_")
-      const _message = await _channel.messages.fetch(_messageId)
+      const { action: _action, messageId: _messageId, data: _page } = ops.parseCustomId(interaction.customId)
+      const _message = await ops.fetchMessage(_messageId)
+      if (!_message) return
       // Defer update
       await interaction.deferUpdate()
 
       if (_action === "selectemoji" || _action === "selectrole") {
         const updated =
           _action === "selectemoji"
-            ? ((await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
-                { messageId: _messageId },
-                { $set: { "reactions.$[r].emoji": interaction.values[0] ?? "" } },
-                {
-                  arrayFilters: [{ "r.published": false }],
-                  returnDocument: "after"
-                }
-              )) as RoleReactionMessageData)
-            : ((await RoleReaction.findOneAndUpdate<RoleReactionMessageData>(
-                { messageId: _messageId },
-                { $set: { "reactions.$[r].role": interaction.values[0] ?? "" } },
-                {
-                  arrayFilters: [{ "r.published": false }],
-                  returnDocument: "after"
-                }
-              )) as RoleReactionMessageData)
+            ? ((await ops.updateDraftReactionField(_messageId, "emojiId", interaction.values[0] ?? "")) as RoleReactionMessageData)
+            : ((await ops.updateDraftReactionField(_messageId, "roleId", interaction.values[0] ?? "")) as RoleReactionMessageData)
 
-        await _message.edit({
-          components: [await createComponent(interaction, updated), createButtons(updated)],
-          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
-        })
+        await ops.editDraftMessage(_message, updated)
       }
     }
   }

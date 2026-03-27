@@ -13,6 +13,7 @@ import Config from "../config/index.js"
 // import { Databank } from "../databank/index.js"
 
 import DiscordCommands from "../commands/index.js"
+import { reportDiscordError } from "../error.js"
 
 /** Interaction create event handler */
 const ev: DiscordEvent = {
@@ -41,7 +42,11 @@ const ev: DiscordEvent = {
       try {
         await DiscordCommands[commandName].execute(client, interaction)
       } catch (err) {
-        console.error(`[ERROR]: ${err}`)
+        await reportDiscordError(client, err, {
+          source: `command:${commandName}`,
+          interaction,
+          guildId: interaction.guildId ?? undefined
+        })
         // await client.channels.cache
         //   .get(_guild.guild_logs)
         //   ?.send(`There was an error while executing this command!\n${err.code}: ${err.message}`)

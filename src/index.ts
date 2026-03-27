@@ -19,6 +19,14 @@ let argv = minimist(process.argv.slice(2), {
   unknown: () => false
 })
 
+process.on("unhandledRejection", (r) => {
+  console.error(`\nUnhandled rejection: ${r}`)
+})
+
+process.on("uncaughtException", (e) => {
+  console.error(`\nUncaught exception: ${e}`)
+})
+
 // Discord client
 const discord_bot = new DiscordBot()
 
@@ -35,5 +43,5 @@ Databank.connection.once("open", async () => {
 process.on("SIGINT", async () => {
   console.log("\nGracefully shutting down from SIGINT (Ctrl-C)")
   await discord_bot.shutdown()
-  process.exit()
+  process.exit(0)
 })

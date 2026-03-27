@@ -4,7 +4,7 @@
  * @summary Handles the client ready event
  **/
 
-import { Guild, GuildMember, ActivityType, Events } from "discord.js"
+import { Guild, GuildMember, ActivityType, Events, ContainerBuilder, MessageFlags, GuildEmoji } from "discord.js"
 import type { DiscordBot, DiscordEvent, DiscordGuildData, DiscordUserData } from "../types/index.js"
 import Config from "../config/index.js"
 import { DiscordGuild, DiscordUser } from "../databank/index.js"
@@ -15,9 +15,10 @@ const ev: DiscordEvent = {
   once: true,
   execute: async (client: DiscordBot) => {
     if (!client.user) return
+    const _user = client.user
 
-    console.log(`Logged in as ${client.user.displayName}!`)
-    client.user.setActivity(Config.discord.activity, { type: ActivityType.Custom })
+    console.log(`Logged in as ${_user.displayName}!`)
+    _user.setActivity(Config.discord.activity, { type: ActivityType.Custom })
 
     const _guilds: DiscordGuildData[] = await DiscordGuild.find()
     for (let _g = 0; _g < _guilds.length; _g++) {
@@ -26,7 +27,7 @@ const ev: DiscordEvent = {
       if (!_guild) return
       _guild.members.cache.each(async (value: GuildMember) => {
         //DiscordUserData
-        let doc = await DiscordUser.findOneAndUpdate<DiscordUserData>({ id: value.user.id }, new DiscordUser(value.user), {
+        await DiscordUser.findOneAndUpdate<DiscordUserData>({ id: value.user.id }, new DiscordUser(value.user), {
           upsert: true, // create if doesn't exist
           returnDocument: "after", // return updated document
           setDefaultsOnInsert: true // apply defaults on insert
@@ -40,18 +41,15 @@ const ev: DiscordEvent = {
       }
       // Admin logging
       const _logchan = client.channels.cache.get(_guilds[_g].logsChannelId)
-      if (_logchan?.isTextBased() && "send" in _logchan && Config.discord.connected.length > 0) {
-        _logchan.send({
-          embeds: [
-            {
-              color: _guilds[_g].embedColor,
-              description: Config.discord.connected,
-              author: {
-                name: `${client.user.displayName} Connected`,
-                icon_url: "https://media.discordapp.net/stickers/1469552270105383065.webp?size=32&quality=lossless"
-              }
-            }
-          ]
+      if (_logchan?.isTextBased() && "send" in _logchan && Config.discord.connected) {
+        const emoji = _guild.emojis.cache.find((e) => e.name === "connect") as GuildEmoji
+        await _logchan.send({
+          components: [
+            new ContainerBuilder()
+              .setAccentColor(_guilds[_g].embedColor)
+              .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### ${emoji.toString()} ${_user.displayName} Connected`))
+          ],
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
         })
       }
     }
