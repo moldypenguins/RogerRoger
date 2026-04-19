@@ -49,7 +49,7 @@ const ev: DiscordEvent = {
               .setAccentColor(_guilds[_g].embedColor)
               .addTextDisplayComponents((textDisplay) => textDisplay.setContent(`### ${emoji.toString()} ${_user.displayName} Connected`))
           ],
-          flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+          flags: MessageFlags.IsComponentsV2 | MessageFlags.SuppressNotifications
         })
       }
     }
