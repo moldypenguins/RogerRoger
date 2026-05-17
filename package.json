@@ -28,7 +28,7 @@
   "dependencies": {
     "bree": "^9.2.9",
     "dayjs": "^1.11.20",
-    "defu": "^6.1.4",
+    "defu": "^6.1.5",
     "discord.js": "^14.25.1",
     "minimist": "^1.2.8",
     "mongoose": "^9.3.3",
